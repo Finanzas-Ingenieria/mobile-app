@@ -1,20 +1,30 @@
 import 'package:credito_inteligente/screens/home.dart';
-import 'package:credito_inteligente/screens/register.dart';
-import 'package:credito_inteligente/styles/styles.dart';
-import 'package:credito_inteligente/widgets/button.dart';
+import 'package:credito_inteligente/widgets/input_field.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../widgets/input_field.dart';
+import '../styles/styles.dart';
+import '../widgets/button.dart';
+import 'login2.dart';
 
-class Login2 extends StatelessWidget {
-  const Login2({super.key});
+class Register extends StatelessWidget {
+  const Register({super.key});
 
   @override
   Widget build(BuildContext context) {
+    String inputName = '';
+    String inputLastname = '';
     String inputEmail = '';
     String inputPassword = '';
+
+    void _updateInputName(String text) {
+      inputName = text;
+    }
+
+    void _updateInputLastname(String text) {
+      inputLastname = text;
+    }
 
     void _updateInputEmail(String text) {
       inputEmail = text;
@@ -24,52 +34,50 @@ class Login2 extends StatelessWidget {
       inputPassword = text;
     }
 
-    return SafeArea(
-      child: Scaffold(
-        body: ListView(children: [
-          Container(
+    return Scaffold(
+        body: ListView(
+      children: [
+        Container(
             margin: const EdgeInsets.symmetric(horizontal: 35),
             width: double.infinity,
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
                     height: 97,
                   ),
                   Text(
-                    "Iniciar Sesión",
+                    "Crear cuenta",
                     style: GoogleFonts.poppins(
                         color: primaryColor,
                         fontSize: 30,
                         fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 26),
-                  Text("Bienvenido, te hemos\nechado de menos!",
+                  const SizedBox(height: 6),
+                  Text(
+                      "Crea una cuenta para poder utilizar nuestra herramienta",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                          color: secondaryColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 74),
+                          color: tertiaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 54),
+                  InputFieldWidget(
+                      hintText: "Nombre", onTextChanged: _updateInputName),
+                  const SizedBox(height: 26),
+                  InputFieldWidget(
+                      hintText: "Apellido",
+                      onTextChanged: _updateInputLastname),
+                  const SizedBox(height: 26),
                   InputFieldWidget(
                       hintText: "Email", onTextChanged: _updateInputEmail),
-                  const SizedBox(height: 29),
+                  const SizedBox(height: 26),
                   InputFieldWidget(
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
-                  const SizedBox(height: 30),
-                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Text("Olvidaste  tu contraseña?",
-                        textAlign: TextAlign.right,
-                        style: GoogleFonts.poppins(
-                            color: primaryColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600)),
-                  ]),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 34),
                   CustomButton(
-                    text: "Iniciar sesión",
+                    text: "Crear cuenta",
                     buttonColor: primaryColor,
                     textColor: textColor,
                     onPressed: () {
@@ -77,20 +85,20 @@ class Login2 extends StatelessWidget {
                           builder: (context) => const Home()));
                     },
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   InkWell(
-                    onTap: () {
+                    onTap: () => {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const Register()));
+                          builder: (context) => const Login2()))
                     },
-                    child: Text("Crear nueva cuenta",
+                    child: Text("ya tienes una cuenta?",
                         textAlign: TextAlign.right,
                         style: GoogleFonts.poppins(
                             color: tertiaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w600)),
                   ),
-                  const SizedBox(height: 65),
+                  const SizedBox(height: 20),
                   Text("O continua con",
                       textAlign: TextAlign.right,
                       style: GoogleFonts.poppins(
@@ -123,10 +131,8 @@ class Login2 extends StatelessWidget {
                         )
                     ],
                   )
-                ]),
-          ),
-        ]),
-      ),
-    );
+                ])),
+      ],
+    ));
   }
 }

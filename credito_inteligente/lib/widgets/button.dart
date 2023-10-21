@@ -5,12 +5,16 @@ class CustomButton extends StatefulWidget {
   final String text;
   final Color buttonColor;
   final Color textColor;
+  final double width;
+  final Function onPressed;
 
   const CustomButton({
     super.key,
     required this.text,
     required this.buttonColor,
     required this.textColor,
+    this.width = double.infinity,
+    required this.onPressed,
   });
 
   @override
@@ -21,7 +25,7 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 180,
+      width: widget.width,
       height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
@@ -31,10 +35,7 @@ class _CustomButtonState extends State<CustomButton> {
                 BorderRadius.circular(10), // Set the button's border radius
           ),
         ),
-        onPressed: () {
-          // Write your button's click event here
-          print('Button clicked!');
-        },
+        onPressed: () => widget.onPressed(),
         child: Text(
           widget.text,
           style: GoogleFonts.poppins(
