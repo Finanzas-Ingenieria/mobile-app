@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../styles/styles.dart';
+import '../widgets/button.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,8 +15,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final List<String> currencies = ['SOLES', 'DÓLARES'];
+  final List<String> rateTypes = ['TEA', 'TNA'];
+  double ratePercentage = 3.42;
 
   String selectedCurrency = 'SOLES';
+  String selectedRate = 'TEA';
+
   int vehicleValue = 10000;
   double usdToPEN = 3.8;
 
@@ -33,8 +38,13 @@ class _HomeState extends State<Home> {
   double initialQuotaPercentage = 0.2;
   double initialQuota = 0;
 
+  int selectedPeriod = 24;
+  String selectedGracePeriod = 'Ninguno';
+  String selectedLastInstallmentOption = 'Se renovará el vehículo';
+
   final TextEditingController vehicleValueController = TextEditingController();
   final TextEditingController initialQuotaController = TextEditingController();
+  final TextEditingController rateController = TextEditingController();
 
   bool vehicleValueIsValid(String value) {
     if (value.isEmpty) return false;
@@ -102,13 +112,29 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void switchRate(String newRate) {
+    if (newRate == selectedRate) return;
+
+    setState(() {
+      selectedRate = newRate;
+    });
+  }
+
   String getInitialQuota() {
     initialQuota = currentVehicleValue * initialQuotaPercentage;
 
     if (selectedCurrency == 'DÓLARES') {
-      return '\$${initialQuota.toStringAsFixed(2)}';
+      return '\$ ${initialQuota.toStringAsFixed(2)}';
     } else {
       return 'S/ ${initialQuota.toStringAsFixed(2)}';
+    }
+  }
+
+  String getCurrency() {
+    if (selectedCurrency == 'DÓLARES') {
+      return '\$';
+    } else {
+      return 'S/';
     }
   }
 
@@ -203,7 +229,7 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "S/",
+                        hintText: getCurrency(),
                         onTextChanged: (string) {},
                         isNumber: true),
                     const SizedBox(height: 30),
@@ -266,14 +292,17 @@ class _HomeState extends State<Home> {
                             changingVehicleValue = value;
                             if (value.isEmpty ||
                                 (selectedCurrency == "SOLES" &&
-                                    value.length >
-                                        maxVehicleValuePEN.toString().length) ||
+                                        (int.parse(value) >
+                                            maxVehicleValuePEN) ||
+                                    (int.parse(value) < minVehicleValuePEN)) ||
                                 (selectedCurrency == "DÓLARES" &&
-                                    value.toString().length >
-                                        maxVehicleValueUSD.toString().length)) {
+                                        (int.parse(value) >
+                                            maxVehicleValueUSD) ||
+                                    (int.parse(value) < minVehicleValueUSD))) {
                               return;
                             }
-
+                            print("object$value");
+                            currentVehicleValue = int.parse(value);
                             //vehicleValueController.text = value;
                           });
                         },
@@ -290,12 +319,337 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
+                    const SizedBox(height: 15),
+                    Text("Cuota Inicial",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextField(
+                        controller: initialQuotaController,
+                        readOnly: true, // Make the TextField uneditable
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: InputDecoration(
+                          hintText: getInitialQuota(),
+                          filled: true,
+                          fillColor: primaryColorLight,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: primaryColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: primaryColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text("Se abonará el 20% como cuota inicial",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: const Color.fromARGB(255, 148, 148, 148),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 39),
+                    Text("Tipo de tasa (%)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: rateTypes
+                          .map((rate) => FilterChip(
+                                label: Container(
+                                    width: 120,
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      rate,
+                                      style: GoogleFonts.readexPro(
+                                        color: selectedRate == rate
+                                            ? Colors.white
+                                            : homeInputFileTextColor,
+                                      ),
+                                    )),
+                                selected: selectedRate == rate,
+                                onSelected: (selected) {
+                                  switchRate(rate);
+                                },
+                                selectedColor: primaryColor,
+                                backgroundColor: chipUnselectedColor,
+                                checkmarkColor: Colors.white,
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "0 %",
+                        onTextChanged: (string) {},
+                        isNumber: true),
+                    const SizedBox(height: 30),
+                    Text("Seguro desgravament Mensual (%)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "0 %",
+                        onTextChanged: (string) {},
+                        isNumber: true),
+                    const SizedBox(height: 30),
+                    Text("Seguro vehícular Mensual (%)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "0 %",
+                        onTextChanged: (string) {},
+                        isNumber: true),
+                    const SizedBox(height: 30),
+                    Text("Envío físico de estado de cuenta",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "${getCurrency()} 0",
+                        onTextChanged: (string) {},
+                        isNumber: true),
+                    const SizedBox(height: 30),
+                    Text("Periodo de pago (Meses)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Radio button for 2 meses
+                        Row(
+                          children: [
+                            Radio(
+                              value: 24,
+                              groupValue: selectedPeriod,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedPeriod = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "24 meses",
+                              style: GoogleFonts.readexPro(
+                                color: selectedPeriod == 2
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
 
-
-
-          
-
-
+                        // Radio button for 3 meses
+                        Row(
+                          children: [
+                            Radio(
+                              value: 36,
+                              groupValue: selectedPeriod,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedPeriod = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "36 meses",
+                              style: GoogleFonts.readexPro(
+                                color: selectedPeriod == 3
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text("Periodo de gracia (Meses)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Ninguno',
+                              groupValue: selectedGracePeriod,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedGracePeriod = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Ninguno",
+                              style: GoogleFonts.readexPro(
+                                color: selectedGracePeriod == 'Ninguno'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Total',
+                              groupValue: selectedGracePeriod,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedGracePeriod = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Total",
+                              style: GoogleFonts.readexPro(
+                                color: selectedGracePeriod == 'Total'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Parcial',
+                              groupValue: selectedGracePeriod,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedGracePeriod = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Parcial",
+                              style: GoogleFonts.readexPro(
+                                color: selectedGracePeriod == 'Parcial'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text("Tras pagar la última cuota",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Se renovará el vehículo',
+                              groupValue: selectedLastInstallmentOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedLastInstallmentOption = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Se renovará el vehículo",
+                              style: GoogleFonts.readexPro(
+                                color: selectedLastInstallmentOption ==
+                                        'Se renovará el vehículo'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Se quedará con el auto',
+                              groupValue: selectedLastInstallmentOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedLastInstallmentOption = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Se quedará con el auto",
+                              style: GoogleFonts.readexPro(
+                                color: selectedLastInstallmentOption ==
+                                        'Se quedará con el auto'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio<String>(
+                              value: 'Devolverá el auto',
+                              groupValue: selectedLastInstallmentOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedLastInstallmentOption = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Devolverá el auto",
+                              style: GoogleFonts.readexPro(
+                                color: selectedLastInstallmentOption ==
+                                        'Devolverá el auto'
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomButton(
+                      text: "Iniciar Sesión",
+                      buttonColor: primaryColor,
+                      textColor: textColor,
+                      onPressed: () {
+                        // Navigator.of(context).push(MaterialPageRoute(
+                        //     builder: (context) => const Login2()));
+                      },
+                    ),
+                    const SizedBox(height: 50),
                   ],
                 )),
           ],

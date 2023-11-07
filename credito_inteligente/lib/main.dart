@@ -1,4 +1,4 @@
-import 'package:credito_inteligente/screens/login.dart';
+import 'package:credito_inteligente/screens/history.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Crédito Inteligente',
-      home: Login(),
+      home: History(),
     );
   }
 }
