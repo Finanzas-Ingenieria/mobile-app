@@ -1,14 +1,17 @@
 import 'package:credito_inteligente/styles/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputFieldWidget extends StatefulWidget {
   final String hintText;
   final bool obscureText;
+  final bool isNumber;
   final Function(String) onTextChanged;
   const InputFieldWidget(
       {super.key,
       required this.hintText,
       this.obscureText = false,
+      this.isNumber = false,
       required this.onTextChanged});
 
   @override
@@ -32,6 +35,13 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
     return SizedBox(
       width: double.infinity,
       child: TextField(
+        keyboardType:
+            widget.isNumber ? TextInputType.number : TextInputType.text,
+        inputFormatters: [
+          widget.isNumber
+              ? FilteringTextInputFormatter.digitsOnly
+              : FilteringTextInputFormatter.singleLineFormatter
+        ],
         controller: _textEditingController,
         focusNode: _focusNode,
         obscureText: widget.obscureText,
