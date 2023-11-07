@@ -1,8 +1,10 @@
+import 'package:credito_inteligente/screens/select_car.dart';
 import 'package:credito_inteligente/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../models/car.dart';
 import '../styles/styles.dart';
 import '../widgets/button.dart';
 
@@ -233,11 +235,42 @@ class _HomeState extends State<Home> {
                         onTextChanged: (string) {},
                         isNumber: true),
                     const SizedBox(height: 30),
-                    Text("Valor del vehículo",
-                        style: GoogleFonts.readexPro(
-                            color: tertiaryColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Valor del vehículo",
+                            style: GoogleFonts.readexPro(
+                                color: tertiaryColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500)),
+                        CustomButton(
+                          buttonHeight: 40,
+                          radius: 50,
+                          fontSize: 15,
+                          width: 130,
+                          text: "Seleccionar",
+                          buttonColor: primaryColor,
+                          textColor: textColor,
+                          onPressed: () async {
+                            Car? selectedCar =
+                                await Navigator.of(context).push<Car>(
+                              MaterialPageRoute(
+                                builder: (context) => const SelectCar(),
+                              ),
+                            );
+
+                            if (selectedCar != null) {
+                              print("ICUUUU");
+                              setState(() {
+                                currentVehicleValue = selectedCar.price.toInt();
+                                vehicleValueController.text =
+                                    currentVehicleValue.toString();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 12),
                     SliderTheme(
                       data: SliderTheme.of(context)

@@ -149,7 +149,7 @@ class SelectCar extends StatelessWidget {
                                 const Spacer(),
                                 ElevatedButton(
                                   onPressed: () {
-                                    // Handle button click here
+                                    Navigator.of(context).pop(car);
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:
