@@ -1,3 +1,4 @@
+import 'package:credito_inteligente/screens/plan_pago.dart';
 import 'package:credito_inteligente/screens/select_car.dart';
 import 'package:credito_inteligente/widgets/input_field.dart';
 import 'package:flutter/material.dart';
@@ -160,11 +161,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: ListView(
           children: [
             Container(
-                margin: const EdgeInsets.symmetric(horizontal: 40),
+                margin: MediaQuery.of(context).size.width < webScreenWidth
+                    ? const EdgeInsets.symmetric(horizontal: 40)
+                    : const EdgeInsets.symmetric(horizontal: 200),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -674,12 +676,12 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 20),
                     CustomButton(
-                      text: "Iniciar Sesión",
+                      text: "Generar Plan de Pagos",
                       buttonColor: primaryColor,
                       textColor: textColor,
                       onPressed: () {
-                        // Navigator.of(context).push(MaterialPageRoute(
-                        //     builder: (context) => const Login2()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const PlanDePago()));
                       },
                     ),
                     const SizedBox(height: 50),

@@ -1,5 +1,7 @@
-import 'package:credito_inteligente/screens/home.dart';
+import 'dart:html';
+
 import 'package:credito_inteligente/screens/register.dart';
+import 'package:credito_inteligente/services/user_service.dart';
 import 'package:credito_inteligente/styles/styles.dart';
 import 'package:credito_inteligente/widgets/button.dart';
 import 'package:feather_icons/feather_icons.dart';
@@ -7,23 +9,61 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/input_field.dart';
+import 'home.dart';
 
-class Login2 extends StatelessWidget {
+class Login2 extends StatefulWidget {
   const Login2({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    String inputEmail = '';
-    String inputPassword = '';
+  State<Login2> createState() => _Login2State();
+}
 
-    void _updateInputEmail(String text) {
+class _Login2State extends State<Login2> {
+  String inputEmail = '';
+  String inputPassword = '';
+
+  void _updateInputEmail(String text) {
+    setState(() {
       inputEmail = text;
-    }
+    });
+  }
 
-    void _updateInputPassword(String text) {
+  void _updateInputPassword(String text) {
+    setState(() {
       inputPassword = text;
-    }
+    });
+  }
 
+  void getAllUsers() {
+    UserService().getAllUsers().then((users) {
+      print("This are the users");
+
+      for (var user in users) {
+        print(user.toString());
+      }
+    });
+  }
+
+  void getUserByEmailAndPassword() {
+    String email = inputEmail;
+    String password = inputPassword;
+
+    print("Email: $email");
+    print("Password: $password");
+
+    UserService().getUserByEmailAndPassword(email, password).then((user) {
+      if (user.id == 0) {
+        //print user not found as an alert in browser
+        window.alert("Usuario no encontrado");
+      } else {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const Home()));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: ListView(children: [
@@ -56,6 +96,7 @@ class Login2 extends StatelessWidget {
                       hintText: "Email", onTextChanged: _updateInputEmail),
                   const SizedBox(height: 29),
                   InputFieldWidget(
+                      obscureText: true,
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
                   const SizedBox(height: 30),
@@ -73,8 +114,7 @@ class Login2 extends StatelessWidget {
                     buttonColor: primaryColor,
                     textColor: textColor,
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const Home()));
+                      getUserByEmailAndPassword();
                     },
                   ),
                   const SizedBox(height: 40),

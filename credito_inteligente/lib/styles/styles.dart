@@ -12,3 +12,5 @@ const Color loginInputFileTextColor = Color(0xFF626262);
 const Color homeInputFileTextColor = Color(0xFF999999);
 const Color iconButtonColor = Color(0xFFECECEC);
 const Color chipUnselectedColor = Color.fromARGB(255, 244, 244, 244);
+
+const webScreenWidth = 640;

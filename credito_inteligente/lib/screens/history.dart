@@ -122,7 +122,7 @@ class History extends StatelessWidget {
                 const SizedBox(height: 20),
                 SizedBox(
                   height: MediaQuery.of(context).size.height *
-                      0.8, // Set a fixed height for the list
+                      0.785, // Set a fixed height for the list
                   child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,

@@ -1,4 +1,5 @@
-import 'package:credito_inteligente/screens/home.dart';
+import 'package:credito_inteligente/models/user.dart';
+import 'package:credito_inteligente/services/user_service.dart';
 import 'package:credito_inteligente/widgets/input_field.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
@@ -8,32 +9,63 @@ import '../styles/styles.dart';
 import '../widgets/button.dart';
 import 'login2.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
   const Register({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    String inputName = '';
-    String inputLastname = '';
-    String inputEmail = '';
-    String inputPassword = '';
+  State<Register> createState() => _RegisterState();
+}
 
-    void _updateInputName(String text) {
+class _RegisterState extends State<Register> {
+  String inputName = '';
+  String inputLastname = '';
+  String inputEmail = '';
+  String inputPassword = '';
+
+  void _updateInputName(String text) {
+    setState(() {
       inputName = text;
-    }
+    });
+  }
 
-    void _updateInputLastname(String text) {
+  void _updateInputLastname(String text) {
+    setState(() {
       inputLastname = text;
-    }
+    });
+  }
 
-    void _updateInputEmail(String text) {
+  void _updateInputEmail(String text) {
+    setState(() {
       inputEmail = text;
-    }
+    });
+  }
 
-    void _updateInputPassword(String text) {
+  void _updateInputPassword(String text) {
+    setState(() {
       inputPassword = text;
-    }
+    });
+  }
 
+  void createUser() {
+    User newUser = User(
+      id: 0,
+      name: inputName,
+      lastname: inputLastname,
+      email: inputEmail,
+      password: inputPassword,
+    );
+
+    UserService().createUser(newUser).then((user) {
+      print("User created");
+      print(user.toString());
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const Login2()));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
       children: [
@@ -73,6 +105,7 @@ class Register extends StatelessWidget {
                       hintText: "Email", onTextChanged: _updateInputEmail),
                   const SizedBox(height: 26),
                   InputFieldWidget(
+                      obscureText: true,
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
                   const SizedBox(height: 34),
@@ -81,8 +114,7 @@ class Register extends StatelessWidget {
                     buttonColor: primaryColor,
                     textColor: textColor,
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const Home()));
+                      createUser();
                     },
                   ),
                   const SizedBox(height: 30),
