@@ -1,5 +1,6 @@
 import 'dart:html';
 
+import 'package:credito_inteligente/screens/main_menu.dart';
 import 'package:credito_inteligente/screens/register.dart';
 import 'package:credito_inteligente/services/user_service.dart';
 import 'package:credito_inteligente/styles/styles.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/input_field.dart';
-import 'home.dart';
 
 class Login2 extends StatefulWidget {
   const Login2({super.key});
@@ -57,7 +57,7 @@ class _Login2State extends State<Login2> {
         window.alert("Usuario no encontrado");
       } else {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const Home()));
+            .push(MaterialPageRoute(builder: (context) => const MainMenu()));
       }
     });
   }
