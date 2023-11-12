@@ -5,23 +5,34 @@ import 'package:credito_inteligente/screens/home.dart';
 import 'package:credito_inteligente/screens/profile.dart';
 import 'package:flutter/material.dart';
 
+import '../models/user.dart';
 import '../styles/styles.dart';
 
 class MainMenu extends StatefulWidget {
-  const MainMenu({super.key});
+  final User user;
+  const MainMenu({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<MainMenu> createState() => _MainMenuState();
 }
 
 class _MainMenuState extends State<MainMenu> {
-  final List<Widget> screens = [
-    const Home(),
-    const History(),
-    const Profile(),
-  ];
-
+  late List<Widget> screens;
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    screens = [
+      Home(user: widget.user),
+      History(user: widget.user),
+      Profile(user: widget.user),
+    ];
+    print(widget.user);
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -48,16 +48,13 @@ class _Login2State extends State<Login2> {
     String email = inputEmail;
     String password = inputPassword;
 
-    print("Email: $email");
-    print("Password: $password");
-
     UserService().getUserByEmailAndPassword(email, password).then((user) {
       if (user.id == 0) {
         //print user not found as an alert in browser
         window.alert("Usuario no encontrado");
       } else {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const MainMenu()));
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => MainMenu(user: user)));
       }
     });
   }
@@ -68,7 +65,9 @@ class _Login2State extends State<Login2> {
       child: Scaffold(
         body: ListView(children: [
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 35),
+            margin: MediaQuery.of(context).size.width > webScreenWidth
+                ? const EdgeInsets.symmetric(horizontal: 400)
+                : const EdgeInsets.symmetric(horizontal: 35),
             width: double.infinity,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -99,7 +98,7 @@ class _Login2State extends State<Login2> {
                       obscureText: true,
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     Text("Olvidaste  tu contraseña?",
                         textAlign: TextAlign.right,
@@ -162,7 +161,7 @@ class _Login2State extends State<Login2> {
                           ),
                         )
                     ],
-                  )
+                  ),
                 ]),
           ),
         ]),

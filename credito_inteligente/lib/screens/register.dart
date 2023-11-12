@@ -70,7 +70,9 @@ class _RegisterState extends State<Register> {
         body: ListView(
       children: [
         Container(
-            margin: const EdgeInsets.symmetric(horizontal: 35),
+            margin: MediaQuery.of(context).size.width > webScreenWidth
+                ? const EdgeInsets.symmetric(horizontal: 400)
+                : const EdgeInsets.symmetric(horizontal: 35),
             width: double.infinity,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

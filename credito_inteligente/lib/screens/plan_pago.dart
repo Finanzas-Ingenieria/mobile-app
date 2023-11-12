@@ -1,12 +1,71 @@
-import 'package:credito_inteligente/widgets/custom_table.dart';
+import 'package:credito_inteligente/models/plan_pago.dart';
+import 'package:credito_inteligente/models/vehicle_loan.dart';
+import 'package:credito_inteligente/services/vehicle_loan_service.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
+import '../models/plan_pago_row.dart';
 import '../styles/styles.dart';
+import '../widgets/button.dart';
+import '../widgets/custom_table.dart';
 
-class PlanDePago extends StatelessWidget {
-  const PlanDePago({super.key});
+class PlanDePago extends StatefulWidget {
+  final VehicleLoan vehicleLoan;
+  const PlanDePago({super.key, required this.vehicleLoan});
+
+  @override
+  State<PlanDePago> createState() => _PlanDePagoState();
+}
+
+class _PlanDePagoState extends State<PlanDePago> {
+  late List<PlanPagoRow> rows;
+  late PlanPago planPago;
+  late VehicleLoan vehicleLoan;
+
+  double getFlow() {
+    return widget.vehicleLoan.vehiclePrice -
+        0.2 * widget.vehicleLoan.vehiclePrice +
+        widget.vehicleLoan.notaryCosts +
+        widget.vehicleLoan.registrationCosts;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    rows = [
+      PlanPagoRow(
+          month: 0,
+          gracePeriod: '',
+          date: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+          fc_initialAmount: 0,
+          fc_interest: 0,
+          fc_amortization: 0,
+          fc_lifeEnsurance: 0,
+          fc_finalAmount: 0,
+          initialAmount: 0,
+          interestAmount: 0,
+          quota: 0,
+          amortization: 0,
+          lifeEnsurance: 0,
+          vehicleInsurance: 0,
+          physicalShipments: 0,
+          administrativeCost: 0,
+          finalAmount: 0,
+          flow: getFlow())
+    ];
+
+    vehicleLoan = widget.vehicleLoan;
+    planPago = PlanPago(planPagoRows: rows, vehicleLoan: vehicleLoan);
+  }
+
+  void savePaymentPlan() {
+    VehicleLoanService().createVehicleLoan(vehicleLoan).then((value) => {
+          if (value != null) {print("LETS GO BABAY"), print(value)}
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,9 +240,25 @@ class PlanDePago extends StatelessWidget {
                                   fontWeight: FontWeight.w500)),
                         ],
                       ),
-                      const CustomTable()
                     ],
                   ),
+                  CustomButton(
+                      text: "Ver calendario",
+                      buttonColor: Colors.indigo,
+                      textColor: textColor,
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => CustomTable(
+                                  planPago: planPago,
+                                )));
+                      }),
+                  CustomButton(
+                      text: "Guardar Plan de Pagos",
+                      buttonColor: Colors.indigo,
+                      textColor: textColor,
+                      onPressed: () {
+                        savePaymentPlan();
+                      })
                 ],
               ),
             )

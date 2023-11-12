@@ -1,16 +1,22 @@
+import 'package:credito_inteligente/models/client.dart';
 import 'package:credito_inteligente/screens/plan_pago.dart';
 import 'package:credito_inteligente/screens/select_car.dart';
 import 'package:credito_inteligente/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../models/car.dart';
+import '../models/user.dart';
+import '../models/vehicle_loan.dart';
 import '../styles/styles.dart';
 import '../widgets/button.dart';
+import '../widgets/snack_bar.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final User user;
+  const Home({super.key, required this.user});
 
   @override
   State<Home> createState() => _HomeState();
@@ -43,11 +49,27 @@ class _HomeState extends State<Home> {
 
   int selectedPeriod = 24;
   String selectedGracePeriod = 'Ninguno';
-  String selectedLastInstallmentOption = 'Se renovará el vehículo';
+  String selectedLastQuota = 'Se renovará el vehículo';
+  int selectedLoanPercentage = 30;
 
   final TextEditingController vehicleValueController = TextEditingController();
   final TextEditingController initialQuotaController = TextEditingController();
   final TextEditingController rateController = TextEditingController();
+
+  //data
+  String clientName = '';
+  String clientLastName = '';
+  double mountlyIncome = 0;
+  double rateAmount = 0;
+  double desgravamentMontlyRate = 0;
+  double vehicleInsuranceAnnualRate = 0;
+  double physicalShipment = 0;
+  double administrationExpenses = 0;
+  double notaryExpenses = 0;
+  double registryExpenses = 0;
+  double gracePeriod = 0;
+
+  bool buttonClicked = false;
 
   bool vehicleValueIsValid(String value) {
     if (value.isEmpty) return false;
@@ -144,9 +166,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    print("HOME");
+    print(widget.user);
 
     vehicleValueController.text =
         currentVehicleValue.toString(); // Initialize input field value
+
+    changingVehicleValue = currentVehicleValue.toString();
 
     if (selectedCurrency == 'DÓLARES') {
       minVehicleValue = minVehicleValueUSD;
@@ -154,6 +180,160 @@ class _HomeState extends State<Home> {
     } else {
       minVehicleValue = minVehicleValuePEN;
       maxVehicleValue = maxVehicleValuePEN;
+    }
+  }
+
+  void updateClientName(String text) {
+    setState(() {
+      clientName = text;
+    });
+  }
+
+  void updateClientLastName(String text) {
+    setState(() {
+      clientLastName = text;
+    });
+  }
+
+  void updateMonthlyIncome(String text) {
+    setState(() {
+      mountlyIncome = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateAnnualRate(String text) {
+    setState(() {
+      rateAmount = double.parse(text);
+    });
+  }
+
+  void updateDesgravamentRate(String text) {
+    setState(() {
+      desgravamentMontlyRate = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateVehicleInsuranceRate(String text) {
+    setState(() {
+      vehicleInsuranceAnnualRate = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updatePhysicalShipment(String text) {
+    setState(() {
+      physicalShipment = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateAdministrationExpenses(String text) {
+    setState(() {
+      administrationExpenses = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateNotaryExpenses(String text) {
+    setState(() {
+      notaryExpenses = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateRegistryExpenses(String text) {
+    setState(() {
+      registryExpenses = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  void updateGracePeriod(String text) {
+    setState(() {
+      gracePeriod = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
+  String getGraceType(String graceType) {
+    if (graceType == 'Ninguno') {
+      return 'S';
+    } else if (graceType == 'Total') {
+      return 'T';
+    } else {
+      return 'P';
+    }
+  }
+
+  String getLastQuota(String lastQuota) {
+    if (lastQuota == 'Se renovará el vehículo') {
+      return 'RENOVAR';
+    } else if (lastQuota == 'Se quedará con el auto') {
+      return 'QUEDAR';
+    } else {
+      return 'DEVOLVER';
+    }
+  }
+
+  DateTime addOneDay() {
+    DateTime now = DateTime.now();
+    DateTime newDate = DateTime(now.year, now.month, now.day + 1);
+    return newDate;
+  }
+
+  void validateData() {
+    //validate data
+    if (clientName.isNotEmpty &&
+        clientLastName.isNotEmpty &&
+        vehicleValueIsValid(changingVehicleValue) &&
+        (rateAmount >= 8 && rateAmount <= 24) &&
+        desgravamentMontlyRate > 0 &&
+        vehicleInsuranceAnnualRate > 0 &&
+        administrationExpenses > 0 &&
+        notaryExpenses > 0 &&
+        registryExpenses > 0 &&
+        (gracePeriod > 0 && gracePeriod <= 6)) {
+      Client newClient = Client(
+        id: 0,
+        name: clientName,
+        lastname: clientLastName,
+      );
+
+      //create new vehicle loan
+      VehicleLoan newVehicleLoan = VehicleLoan(
+          id: 0,
+          client: newClient,
+          currency: selectedCurrency == 'DÓLARES' ? 'USD' : 'PEN',
+          loanPercentage: selectedLoanPercentage.toDouble() / 100,
+          startedDate: DateFormat('dd/MM/yyyy').format(addOneDay()),
+          vehiclePrice: currentVehicleValue.toDouble(),
+          rateAmount: rateAmount / 100,
+          desgravamenRate: desgravamentMontlyRate / 100,
+          vehicleInsurance: vehicleInsuranceAnnualRate / 100,
+          physicalShipment: physicalShipment,
+          paymentPeriod: selectedPeriod,
+          graceType: getGraceType(selectedGracePeriod),
+          gracePeriod: gracePeriod
+              .toInt(), //validate that must be lower than payment period
+          lastQuota: getLastQuota(selectedLastQuota),
+          administrationCosts: administrationExpenses,
+          appraisal: 0,
+          notaryCosts: notaryExpenses,
+          registrationCosts: registryExpenses,
+          rateType: selectedRate,
+          user: widget.user);
+
+      print(newVehicleLoan);
+
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => PlanDePago(vehicleLoan: newVehicleLoan)));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: CustomSnackBarContent(
+            errorText:
+                "Por favor, ingrese todos los datos correctamente para continuar",
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 5),
+        ),
+      );
     }
   }
 
@@ -188,10 +368,33 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 24),
                     InputFieldWidget(
-                        hintText: "Nombres", onTextChanged: (string) {}),
+                        hintText: "Nombres", onTextChanged: updateClientName),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Ingrese un nombre válido",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: clientName.isEmpty && buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 11),
                     InputFieldWidget(
-                        hintText: "Apellidos", onTextChanged: (string) {}),
+                        hintText: "Apellidos",
+                        onTextChanged: updateClientLastName),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Ingrese un apellido válido",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: clientLastName.isEmpty && buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 39),
                     Text("Moneda",
                         style: GoogleFonts.readexPro(
@@ -234,8 +437,19 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 12),
                     InputFieldWidget(
                         hintText: getCurrency(),
-                        onTextChanged: (string) {},
+                        onTextChanged: updateMonthlyIncome,
                         isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor no puede ser $mountlyIncome",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (mountlyIncome == 0) && buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -396,6 +610,63 @@ class _HomeState extends State<Home> {
                             fontSize: 12,
                             fontWeight: FontWeight.w600)),
                     const SizedBox(height: 39),
+                    Text("Porcentaje del prestamo",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Radio button for 2 meses
+                        Row(
+                          children: [
+                            Radio(
+                              value: 30,
+                              groupValue: selectedLoanPercentage,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedLoanPercentage = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "30%",
+                              style: GoogleFonts.readexPro(
+                                color: selectedLoanPercentage == 2
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Radio button for 3 meses
+                        Row(
+                          children: [
+                            Radio(
+                              value: 40,
+                              groupValue: selectedLoanPercentage,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedLoanPercentage = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "40%",
+                              style: GoogleFonts.readexPro(
+                                color: selectedLoanPercentage == 3
+                                    ? primaryColor
+                                    : Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
                     Text("Tipo de tasa (%)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -428,11 +699,23 @@ class _HomeState extends State<Home> {
                               ))
                           .toList(),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     InputFieldWidget(
                         hintText: "0 %",
-                        onTextChanged: (string) {},
+                        onTextChanged: updateAnnualRate,
                         isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor debe estar entre 8% y 24%",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (rateAmount < 8 || rateAmount > 24) &&
+                                      buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 30),
                     Text("Seguro desgravament Mensual (%)",
                         style: GoogleFonts.readexPro(
@@ -442,10 +725,22 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 12),
                     InputFieldWidget(
                         hintText: "0 %",
-                        onTextChanged: (string) {},
+                        onTextChanged: updateDesgravamentRate,
                         isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (desgravamentMontlyRate == 0) &&
+                                      buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 30),
-                    Text("Seguro vehícular Mensual (%)",
+                    Text("Seguro vehícular Anual (%)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
                             fontSize: 16,
@@ -453,10 +748,22 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 12),
                     InputFieldWidget(
                         hintText: "0 %",
-                        onTextChanged: (string) {},
+                        onTextChanged: updateVehicleInsuranceRate,
                         isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (vehicleInsuranceAnnualRate == 0) &&
+                                      buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 30),
-                    Text("Envío físico de estado de cuenta",
+                    Text("Envío físico de estado de cuenta (Mensual)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
                             fontSize: 16,
@@ -464,8 +771,75 @@ class _HomeState extends State<Home> {
                     const SizedBox(height: 12),
                     InputFieldWidget(
                         hintText: "${getCurrency()} 0",
-                        onTextChanged: (string) {},
+                        onTextChanged: updatePhysicalShipment,
                         isNumber: true),
+                    const SizedBox(height: 30),
+                    Text("Gastos de Administración (Mensual)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "${getCurrency()} 0",
+                        onTextChanged: updateAdministrationExpenses,
+                        isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (administrationExpenses == 0) &&
+                                      buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
+                    const SizedBox(height: 30),
+                    Text("Costes Notariales",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "${getCurrency()} 0",
+                        onTextChanged: updateNotaryExpenses,
+                        isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (notaryExpenses == 0) && buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
+                    const SizedBox(height: 30),
+                    Text("Costes Registrales",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: "${getCurrency()} 0",
+                        onTextChanged: updateRegistryExpenses,
+                        isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (registryExpenses == 0) && buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
                     const SizedBox(height: 30),
                     Text("Periodo de pago (Meses)",
                         style: GoogleFonts.readexPro(
@@ -597,6 +971,35 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     ),
+                    selectedGracePeriod != 'Ninguno'
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              InputFieldWidget(
+                                hintText: "1 mes",
+                                onTextChanged: updateGracePeriod,
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                        "Este valor tiene que ser mayor a 0 y maximo 6 meses",
+                                        textAlign: TextAlign.right,
+                                        style: GoogleFonts.poppins(
+                                            color: (gracePeriod <= 0 ||
+                                                        gracePeriod > 6) &&
+                                                    buttonClicked
+                                                ? Colors.red
+                                                : const Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600)),
+                                  ]),
+                              const SizedBox(height: 10),
+                            ],
+                          )
+                        : const SizedBox(height: 0),
                     const SizedBox(height: 20),
                     Text("Tras pagar la última cuota",
                         style: GoogleFonts.readexPro(
@@ -610,17 +1013,17 @@ class _HomeState extends State<Home> {
                           children: [
                             Radio<String>(
                               value: 'Se renovará el vehículo',
-                              groupValue: selectedLastInstallmentOption,
+                              groupValue: selectedLastQuota,
                               onChanged: (value) {
                                 setState(() {
-                                  selectedLastInstallmentOption = value!;
+                                  selectedLastQuota = value!;
                                 });
                               },
                             ),
                             Text(
                               "Se renovará el vehículo",
                               style: GoogleFonts.readexPro(
-                                color: selectedLastInstallmentOption ==
+                                color: selectedLastQuota ==
                                         'Se renovará el vehículo'
                                     ? primaryColor
                                     : Colors.black,
@@ -632,17 +1035,17 @@ class _HomeState extends State<Home> {
                           children: [
                             Radio<String>(
                               value: 'Se quedará con el auto',
-                              groupValue: selectedLastInstallmentOption,
+                              groupValue: selectedLastQuota,
                               onChanged: (value) {
                                 setState(() {
-                                  selectedLastInstallmentOption = value!;
+                                  selectedLastQuota = value!;
                                 });
                               },
                             ),
                             Text(
                               "Se quedará con el auto",
                               style: GoogleFonts.readexPro(
-                                color: selectedLastInstallmentOption ==
+                                color: selectedLastQuota ==
                                         'Se quedará con el auto'
                                     ? primaryColor
                                     : Colors.black,
@@ -654,18 +1057,17 @@ class _HomeState extends State<Home> {
                           children: [
                             Radio<String>(
                               value: 'Devolverá el auto',
-                              groupValue: selectedLastInstallmentOption,
+                              groupValue: selectedLastQuota,
                               onChanged: (value) {
                                 setState(() {
-                                  selectedLastInstallmentOption = value!;
+                                  selectedLastQuota = value!;
                                 });
                               },
                             ),
                             Text(
                               "Devolverá el auto",
                               style: GoogleFonts.readexPro(
-                                color: selectedLastInstallmentOption ==
-                                        'Devolverá el auto'
+                                color: selectedLastQuota == 'Devolverá el auto'
                                     ? primaryColor
                                     : Colors.black,
                               ),
@@ -680,8 +1082,10 @@ class _HomeState extends State<Home> {
                       buttonColor: primaryColor,
                       textColor: textColor,
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const PlanDePago()));
+                        setState(() {
+                          buttonClicked = true;
+                        });
+                        validateData();
                       },
                     ),
                     const SizedBox(height: 50),

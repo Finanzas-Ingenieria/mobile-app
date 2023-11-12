@@ -39,7 +39,10 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
             widget.isNumber ? TextInputType.number : TextInputType.text,
         inputFormatters: [
           widget.isNumber
-              ? FilteringTextInputFormatter.digitsOnly
+              ? FilteringTextInputFormatter.allow(
+                  RegExp(
+                      r'^\d+\.?\d{0,4}'), // Allow digits and a dot with up to two decimal places
+                )
               : FilteringTextInputFormatter.singleLineFormatter
         ],
         controller: _textEditingController,

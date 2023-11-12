@@ -35,7 +35,7 @@ class Login extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w400)),
               const SizedBox(height: 58),
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -49,7 +49,7 @@ class Login extends StatelessWidget {
                           builder: (context) => const Login2()));
                     },
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(height: 10),
                   CustomButton(
                     text: "Registrarse",
                     buttonColor: textColor,

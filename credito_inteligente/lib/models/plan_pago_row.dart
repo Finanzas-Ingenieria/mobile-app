@@ -1,31 +1,41 @@
 class PlanPagoRow {
   int month;
-  String date;
-  double ratePercentage;
   String gracePeriod;
-  double initialCapital;
-  double interest;
+  String date;
+  double fc_initialAmount;
+  double fc_interest;
+  int fc_amortization;
+  double fc_lifeEnsurance;
+  double fc_finalAmount;
+  double initialAmount;
+  double interestAmount;
   double quota;
   double amortization;
   double lifeEnsurance;
-  double secureInGood;
+  double vehicleInsurance;
   double physicalShipments;
-  double finalCapital;
+  double administrativeCost;
+  double finalAmount;
   double flow;
 
   PlanPagoRow({
     required this.month,
-    required this.date,
-    required this.ratePercentage,
     required this.gracePeriod,
-    required this.initialCapital,
-    required this.interest,
+    required this.date,
+    required this.fc_initialAmount,
+    required this.fc_interest,
+    required this.fc_amortization,
+    required this.fc_lifeEnsurance,
+    required this.fc_finalAmount,
+    required this.initialAmount,
+    required this.interestAmount,
     required this.quota,
     required this.amortization,
     required this.lifeEnsurance,
-    required this.secureInGood,
+    required this.vehicleInsurance,
     required this.physicalShipments,
-    required this.finalCapital,
+    required this.administrativeCost,
+    required this.finalAmount,
     required this.flow,
   });
 }
