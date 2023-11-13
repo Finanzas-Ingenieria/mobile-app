@@ -122,7 +122,11 @@ class _CustomTableState extends State<CustomTable> {
                     : const Color.fromARGB(172, 255, 192, 134),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(column),
+                  child: Text(column,
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      )),
                 ),
               );
             },
@@ -163,14 +167,34 @@ class _CustomTableState extends State<CustomTable> {
 
   List<TableCell> getCells(List<dynamic> row) {
     return row.asMap().entries.map((entry) {
+      Color backgroundColor;
+      if (row[1] == "P" || row[1] == "T") {
+        backgroundColor = (entry.key == 1 || entry.key == 16 || entry.key == 17)
+            ? const Color.fromARGB(
+                172, 206, 221, 254) // Your color for "P" or "T"
+            : (entry.key >= 3 && entry.key <= 7)
+                ? const Color.fromARGB(172, 206, 221, 254)
+                : (entry.key == 0)
+                    ? const Color.fromARGB(172, 255, 203, 155)
+                    : const Color.fromARGB(133, 255, 245, 236);
+      } else if (entry.key == 0) {
+        backgroundColor = const Color.fromARGB(172, 255, 203, 155);
+      } else {
+        backgroundColor = (entry.key >= 3 && entry.key <= 7)
+            ? const Color.fromARGB(172, 206, 221, 254)
+            : const Color.fromARGB(133, 255, 245, 236);
+      }
+
       return TableCell(
         child: Container(
-          color: (entry.key >= 3 && entry.key <= 7)
-              ? const Color.fromARGB(172, 206, 221, 254)
-              : const Color.fromARGB(133, 255, 245, 236),
+          color: backgroundColor,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('${entry.value}'),
+            child: Text('${entry.value}',
+                style: GoogleFonts.roboto(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                )),
           ),
         ),
       );
