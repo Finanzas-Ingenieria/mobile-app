@@ -449,7 +449,13 @@ class _PlanDePagoState extends State<PlanDePago> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.indigo,
-          title: const Text("Plan de Pagos"),
+          title: Text(
+            'Plan de Pagos',
+            style: GoogleFonts.readexPro(
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
           leading: InkWell(
               onTap: () => Navigator.pop(context),
               child: const Icon(FeatherIcons.arrowLeft)),
@@ -462,202 +468,97 @@ class _PlanDePagoState extends State<PlanDePago> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  Text("Datos del Cliente",
-                      style: GoogleFonts.readexPro(
-                          color: tertiaryColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500)),
                   Text(
-                      "${widget.vehicleLoan.client.name} ${widget.vehicleLoan.client.lastname}",
-                      style: GoogleFonts.readexPro(
-                          color: homeInputFileTextColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 35),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Precio del Vehículo",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text(widget.vehicleLoan.vehiclePrice.toString(),
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                      const SizedBox(width: 100),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Cuota Inicial",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text(
-                              (widget.vehicleLoan.vehiclePrice * 0.2)
-                                  .toString(),
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
+                    "Datos del Cliente",
+                    style: GoogleFonts.readexPro(
+                      color: tertiaryColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 35),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text("${widget.vehicleLoan.rateType}: ",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text("${widget.vehicleLoan.rateAmount * 100}%",
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                      const SizedBox(width: 175),
-                      Row(
-                        children: [
-                          Text("TCEA: ",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text("35.32%",
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
+                  Text(
+                    "${widget.vehicleLoan.client.name} ${widget.vehicleLoan.client.lastname}",
+                    style: GoogleFonts.readexPro(
+                      color: homeInputFileTextColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 35),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text("VAN: ",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text("12345",
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                      const SizedBox(width: 156),
-                      Row(
-                        children: [
-                          Text("TIR: ",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text("35.32%",
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
+                  const SizedBox(height: 30),
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width * 0.15),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.2),
+                    child: Table(
+                      columnWidths: const {
+                        0: FlexColumnWidth(2.0),
+                        1: FlexColumnWidth(2.0),
+                      },
+                      children: [
+                        buildTableRow("Precio del Vehículo:",
+                            widget.vehicleLoan.vehiclePrice.toString()),
+                        buildTableRow("Cuota Inicial:",
+                            (widget.vehicleLoan.vehiclePrice * 0.2).toString()),
+                        buildTableRow("${widget.vehicleLoan.rateType}:",
+                            "${widget.vehicleLoan.rateAmount * 100}%"),
+                        buildTableRow("TCEA:", "35.32%"),
+                        buildTableRow("VAN:", "12345"),
+                        buildTableRow("TIR:", "35.32%"),
+                        buildTableRow("Fecha de inicio: ",
+                            widget.vehicleLoan.startedDate),
+                        buildTableRow("Periodo de Pago: ",
+                            widget.vehicleLoan.paymentPeriod.toString()),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 35),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text("Fecha de inicio",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text(widget.vehicleLoan.startedDate,
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                      const SizedBox(width: 130),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Periodo de Pago: ",
-                              style: GoogleFonts.readexPro(
-                                  color: tertiaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                          Text(widget.vehicleLoan.paymentPeriod.toString(),
-                              style: GoogleFonts.readexPro(
-                                  color: homeInputFileTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
+                  const SizedBox(height: 30),
+                  Text(
+                    "Última Cuota: ${widget.vehicleLoan.lastQuota}",
+                    style: GoogleFonts.readexPro(
+                      color: tertiaryColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 35),
-                  Text("Última Cuota: ${widget.vehicleLoan.lastQuota}",
-                      style: GoogleFonts.readexPro(
-                          color: tertiaryColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500)),
                   const SizedBox(height: 15),
-                  Text(getLastQuotaMessage(widget.vehicleLoan.lastQuota),
-                      style: GoogleFonts.readexPro(
-                          color: homeInputFileTextColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500)),
+                  Text(
+                    getLastQuotaMessage(widget.vehicleLoan.lastQuota),
+                    style: GoogleFonts.readexPro(
+                      color: homeInputFileTextColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 60),
                   Center(
                     child: CustomButton(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        text: "Ver calendario",
-                        buttonColor: Colors.indigo,
-                        textColor: textColor,
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => CustomTable(
-                                    rows: rows,
-                                  )));
-                        }),
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      text: "Ver calendario",
+                      buttonColor: Colors.indigo,
+                      textColor: textColor,
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => CustomTable(
+                            rows: rows,
+                          ),
+                        ));
+                      },
+                    ),
                   ),
                   const SizedBox(height: 15),
                   widget.fromHistory
                       ? Container()
                       : Center(
                           child: CustomButton(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              text: "Guardar Plan de Pagos",
-                              buttonColor: Colors.indigo,
-                              textColor: textColor,
-                              onPressed: () {
-                                savePaymentPlan();
-                              }),
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            text: "Guardar Plan de Pagos",
+                            buttonColor: Colors.indigo,
+                            textColor: textColor,
+                            onPressed: () {
+                              savePaymentPlan();
+                            },
+                          ),
                         ),
                 ],
               ),
@@ -665,6 +566,35 @@ class _PlanDePagoState extends State<PlanDePago> {
           ],
         ),
       ),
+    );
+  }
+
+  TableRow buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            label,
+            style: GoogleFonts.readexPro(
+              color: tertiaryColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            value,
+            style: GoogleFonts.readexPro(
+              color: homeInputFileTextColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
