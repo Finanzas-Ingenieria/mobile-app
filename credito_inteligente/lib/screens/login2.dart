@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:credito_inteligente/screens/main_menu.dart';
 import 'package:credito_inteligente/screens/register.dart';
 import 'package:credito_inteligente/services/user_service.dart';
@@ -10,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/input_field.dart';
+import '../widgets/snack_bar.dart';
 
 class Login2 extends StatefulWidget {
   const Login2({super.key});
@@ -21,7 +20,7 @@ class Login2 extends StatefulWidget {
 class _Login2State extends State<Login2> {
   String inputEmail = '';
   String inputPassword = '';
-
+  bool buttonClicked = false;
   void _updateInputEmail(String text) {
     setState(() {
       inputEmail = text;
@@ -44,17 +43,56 @@ class _Login2State extends State<Login2> {
     });
   }
 
+  bool invalidEmail() {
+    if (inputEmail.isEmpty) {
+      return true;
+    }
+
+    if (inputEmail.contains("@") && inputEmail.contains(".")) {
+      return false;
+    }
+
+    return true;
+  }
+
   void getUserByEmailAndPassword() {
     String email = inputEmail;
     String password = inputPassword;
 
+    if (invalidEmail() || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: CustomSnackBarContent(
+            mainTile: "Campos Incorrectos!",
+            errorText: "Por favor ingrese un email y contraseña correctos.",
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
+
     UserService().getUserByEmailAndPassword(email, password).then((user) {
       if (user.id == 0) {
-        //print user not found as an alert in browser
-        window.alert("Usuario no encontrado");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: CustomSnackBarContent(
+              mainTile: "Usuario no encontrado!",
+              errorText: "El usuario no se encuentra registrado en el sistema.",
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            duration: Duration(seconds: 5),
+          ),
+        );
       } else {
         Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => MainMenu(user: user)));
+          MaterialPageRoute(builder: (context) => MainMenu(user: user)),
+        );
       }
     });
   }
@@ -74,7 +112,7 @@ class _Login2State extends State<Login2> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 97,
+                    height: 70,
                   ),
                   Text(
                     "Iniciar Sesión",
@@ -93,12 +131,34 @@ class _Login2State extends State<Login2> {
                   const SizedBox(height: 74),
                   InputFieldWidget(
                       hintText: "Email", onTextChanged: _updateInputEmail),
-                  const SizedBox(height: 29),
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("Ingrese un email válido",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: invalidEmail() && buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 15),
                   InputFieldWidget(
                       obscureText: true,
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("Ingrese una contraseña válida",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: inputPassword.isEmpty && buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 5),
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     Text("Olvidaste  tu contraseña?",
                         textAlign: TextAlign.right,
@@ -113,6 +173,9 @@ class _Login2State extends State<Login2> {
                     buttonColor: primaryColor,
                     textColor: textColor,
                     onPressed: () {
+                      setState(() {
+                        buttonClicked = true;
+                      });
                       getUserByEmailAndPassword();
                     },
                   ),
@@ -129,7 +192,7 @@ class _Login2State extends State<Login2> {
                             fontSize: 14,
                             fontWeight: FontWeight.w600)),
                   ),
-                  const SizedBox(height: 65),
+                  const SizedBox(height: 20),
                   Text("O continua con",
                       textAlign: TextAlign.right,
                       style: GoogleFonts.poppins(

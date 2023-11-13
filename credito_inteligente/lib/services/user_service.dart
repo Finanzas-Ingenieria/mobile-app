@@ -82,4 +82,36 @@ class UserService {
       throw Exception('Failed to create user. Error: $e');
     }
   }
+
+  //get user by email
+  //endpoitn /users/email/{email}
+
+  Future<User> getUserByEmail(String email) async {
+    final url = Uri.parse('$baseUrl/email/$email');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'content-type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+        return User.fromJson(jsonData);
+      } else if (response.statusCode == 404) {
+        return User(
+          id: 0,
+          name: '',
+          lastname: '',
+          email: '',
+          password: '',
+        );
+      } else {
+        throw Exception(
+            'Failed to fetch user data. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch user data. Error: $e');
+    }
+  }
 }

@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class CustomSnackBarContent extends StatelessWidget {
+class CustomSnackBarContent extends StatefulWidget {
+  final String errorText;
+  final Color backgroundColor;
+  final Color iconsColor;
+  final String mainTile;
+  final double topPosition;
+
   const CustomSnackBarContent({
     Key? key,
     required this.errorText,
+    required this.mainTile,
+    this.backgroundColor = const Color(0xFFC72C41),
+    this.iconsColor = const Color(0xFF801336),
+    this.topPosition = -16,
   }) : super(key: key);
 
-  final String errorText;
+  @override
+  State<CustomSnackBarContent> createState() => _CustomSnackBarContentState();
+}
 
+class _CustomSnackBarContentState extends State<CustomSnackBarContent> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -17,9 +30,9 @@ class CustomSnackBarContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           height: 90,
-          decoration: const BoxDecoration(
-            color: Color(0xFFC72C41),
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+          decoration: BoxDecoration(
+            color: widget.backgroundColor,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
           child: Row(
             children: [
@@ -28,13 +41,13 @@ class CustomSnackBarContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Campos Incompletos!",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    Text(
+                      widget.mainTile,
+                      style: const TextStyle(fontSize: 18, color: Colors.white),
                     ),
                     const Spacer(),
                     Text(
-                      errorText,
+                      widget.errorText,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -60,14 +73,14 @@ class CustomSnackBarContent extends StatelessWidget {
                   "assets/icons/bubbles.svg",
                   height: 48,
                   width: 40,
-                  color: const Color(0xFF801336),
+                  color: widget.iconsColor,
                 ),
               ],
             ),
           ),
         ),
         Positioned(
-          top: -20,
+          top: widget.topPosition,
           left: 0,
           child: Stack(
             alignment: Alignment.center,
@@ -75,6 +88,7 @@ class CustomSnackBarContent extends StatelessWidget {
               SvgPicture.asset(
                 "assets/icons/fail.svg",
                 height: 40,
+                color: widget.iconsColor,
               ),
               Positioned(
                 top: 10,

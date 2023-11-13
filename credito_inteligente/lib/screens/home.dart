@@ -277,6 +277,15 @@ class _HomeState extends State<Home> {
 
   void validateData() {
     //validate data
+    bool gracePeriodIsValid = false;
+
+    if (selectedGracePeriod != "Ninguno" &&
+        (gracePeriod > 0 && gracePeriod <= 6)) {
+      gracePeriodIsValid = true;
+    } else {
+      gracePeriodIsValid = true;
+    }
+
     if (clientName.isNotEmpty &&
         clientLastName.isNotEmpty &&
         vehicleValueIsValid(changingVehicleValue) &&
@@ -286,7 +295,7 @@ class _HomeState extends State<Home> {
         administrationExpenses > 0 &&
         notaryExpenses > 0 &&
         registryExpenses > 0 &&
-        (gracePeriod > 0 && gracePeriod <= 6)) {
+        gracePeriodIsValid) {
       Client newClient = Client(
         id: 0,
         name: clientName,
@@ -325,6 +334,7 @@ class _HomeState extends State<Home> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: CustomSnackBarContent(
+            mainTile: "Campos Incompletos!",
             errorText:
                 "Por favor, ingrese todos los datos correctamente para continuar",
           ),

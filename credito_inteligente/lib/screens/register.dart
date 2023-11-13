@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../styles/styles.dart';
 import '../widgets/button.dart';
+import '../widgets/snack_bar.dart';
 import 'login2.dart';
 
 class Register extends StatefulWidget {
@@ -21,6 +22,7 @@ class _RegisterState extends State<Register> {
   String inputLastname = '';
   String inputEmail = '';
   String inputPassword = '';
+  bool buttonClicked = false;
 
   void _updateInputName(String text) {
     setState(() {
@@ -47,21 +49,87 @@ class _RegisterState extends State<Register> {
   }
 
   void createUser() {
-    User newUser = User(
-      id: 0,
-      name: inputName,
-      lastname: inputLastname,
-      email: inputEmail,
-      password: inputPassword,
-    );
+    if (inputName.isNotEmpty &&
+        inputLastname.isNotEmpty &&
+        !invalidEmail() &&
+        inputPassword.length > 4) {
+      User newUser = User(
+        id: 0,
+        name: inputName,
+        lastname: inputLastname,
+        email: inputEmail,
+        password: inputPassword,
+      );
 
-    UserService().createUser(newUser).then((user) {
-      print("User created");
-      print(user.toString());
+      UserService().getUserByEmail(inputEmail).then((user) {
+        if (user.id != 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: CustomSnackBarContent(
+                mainTile: "Email Existente!",
+                errorText:
+                    "Este email ya esta registrado, por favor ingrese otro.",
+              ),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              duration: Duration(seconds: 5),
+            ),
+          );
+          return;
+        } else {
+          UserService().createUser(newUser).then((user) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const CustomSnackBarContent(
+                  topPosition: -5,
+                  mainTile: "¡Usuario Creado!",
+                  errorText: " El usuario se ha creado de manera exitosa.",
+                  backgroundColor: Color.fromARGB(255, 63, 118, 195),
+                  iconsColor: Color.fromARGB(255, 34, 75, 132),
+                ),
+                behavior: SnackBarBehavior.floating,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).size.height * 0.85),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                duration: const Duration(seconds: 3),
+              ),
+            );
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const Login2()));
-    });
+            Future.delayed(const Duration(seconds: 5), () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const Login2()));
+            });
+          });
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: CustomSnackBarContent(
+            mainTile: "Campos vacíos!",
+            errorText: "Por favor llene todos los campos de manera correcta.",
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  bool invalidEmail() {
+    if (inputEmail.isEmpty) {
+      return true;
+    }
+
+    if (inputEmail.contains("@") && inputEmail.contains(".")) {
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -78,7 +146,7 @@ class _RegisterState extends State<Register> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 97,
+                    height: 70,
                   ),
                   Text(
                     "Crear cuenta",
@@ -95,27 +163,75 @@ class _RegisterState extends State<Register> {
                           color: tertiaryColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 54),
+                  const SizedBox(height: 40),
                   InputFieldWidget(
                       hintText: "Nombre", onTextChanged: _updateInputName),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("Ingrese un nombre válido",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: inputName.isEmpty && buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 15),
                   InputFieldWidget(
                       hintText: "Apellido",
                       onTextChanged: _updateInputLastname),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("Ingrese un apellido válido",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: inputLastname.isEmpty && buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 15),
                   InputFieldWidget(
                       hintText: "Email", onTextChanged: _updateInputEmail),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 5),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("Ingrese un email válido",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: invalidEmail() && buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 15),
                   InputFieldWidget(
                       obscureText: true,
                       hintText: "Contraseña",
                       onTextChanged: _updateInputPassword),
-                  const SizedBox(height: 34),
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text("La contraseña debe tener al menos 5 caracteres",
+                        textAlign: TextAlign.right,
+                        style: GoogleFonts.poppins(
+                            color: (inputPassword.isEmpty ||
+                                        inputPassword.length <= 4) &&
+                                    buttonClicked
+                                ? Colors.red
+                                : const Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                  const SizedBox(height: 22),
                   CustomButton(
                     text: "Crear cuenta",
                     buttonColor: primaryColor,
                     textColor: textColor,
                     onPressed: () {
+                      setState(() {
+                        buttonClicked = true;
+                      });
                       createUser();
                     },
                   ),
@@ -164,7 +280,7 @@ class _RegisterState extends State<Register> {
                           ),
                         )
                     ],
-                  )
+                  ),
                 ])),
       ],
     ));

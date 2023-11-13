@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:credito_inteligente/models/vehicle_loan.dart';
+import 'package:credito_inteligente/screens/plan_pago.dart';
 import 'package:credito_inteligente/services/vehicle_loan_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -114,6 +115,16 @@ class _HistoryState extends State<History> {
                                 vehicleLoan.client.name[0].toUpperCase();
 
                             return ListTile(
+                              onTap: () {
+                                //navigate to PlanPago using material page route
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PlanDePago(
+                                              vehicleLoan: vehicleLoan,
+                                              fromHistory: true,
+                                            )));
+                              },
                               leading: Container(
                                 width: 50,
                                 height: 50,

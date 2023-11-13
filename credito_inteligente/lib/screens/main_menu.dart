@@ -10,8 +10,10 @@ import '../styles/styles.dart';
 
 class MainMenu extends StatefulWidget {
   final User user;
+  final int firstScreen;
   const MainMenu({
     super.key,
+    this.firstScreen = 0,
     required this.user,
   });
 
@@ -21,11 +23,12 @@ class MainMenu extends StatefulWidget {
 
 class _MainMenuState extends State<MainMenu> {
   late List<Widget> screens;
-  int selectedIndex = 0;
+  late int selectedIndex;
 
   @override
   void initState() {
     super.initState();
+    selectedIndex = widget.firstScreen;
     screens = [
       Home(user: widget.user),
       History(user: widget.user),
@@ -44,8 +47,8 @@ class _MainMenuState extends State<MainMenu> {
         bottomNavigationBar: MediaQuery.of(context).size.width < 640
             ? BottomNavigationBar(
                 currentIndex: selectedIndex,
-                unselectedItemColor: Colors.grey,
-                selectedItemColor: Colors.blue,
+                unselectedItemColor: const Color.fromARGB(255, 188, 188, 188),
+                selectedItemColor: const Color.fromARGB(255, 255, 255, 255),
                 onTap: (index) => setState(() => selectedIndex = index),
                 items: const [
                   BottomNavigationBarItem(
@@ -66,6 +69,10 @@ class _MainMenuState extends State<MainMenu> {
         body: Row(children: [
           if (MediaQuery.of(context).size.width >= webScreenWidth)
             NavigationRail(
+              backgroundColor: Colors.white,
+              selectedIconTheme: const IconThemeData(color: Colors.indigo),
+              unselectedIconTheme: const IconThemeData(
+                  color: Color.fromARGB(255, 131, 141, 206)),
               onDestinationSelected: (index) =>
                   setState(() => selectedIndex = index),
               selectedIndex: selectedIndex,
