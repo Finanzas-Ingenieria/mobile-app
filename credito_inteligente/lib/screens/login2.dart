@@ -1,3 +1,4 @@
+import 'package:credito_inteligente/screens/login.dart';
 import 'package:credito_inteligente/screens/main_menu.dart';
 import 'package:credito_inteligente/screens/register.dart';
 import 'package:credito_inteligente/services/user_service.dart';
@@ -102,6 +103,23 @@ class _Login2State extends State<Login2> {
     return SafeArea(
       child: Scaffold(
         body: ListView(children: [
+          const SizedBox(
+            height: 20,
+          ),
+          //create an icon to go back to the previous page
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 35),
+              IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Login()));
+                },
+                icon: const Icon(Icons.arrow_back),
+              ),
+            ],
+          ),
           Container(
             margin: MediaQuery.of(context).size.width > webScreenWidth
                 ? const EdgeInsets.symmetric(horizontal: 400)
@@ -112,7 +130,7 @@ class _Login2State extends State<Login2> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 70,
+                    height: 50,
                   ),
                   Text(
                     "Iniciar Sesión",

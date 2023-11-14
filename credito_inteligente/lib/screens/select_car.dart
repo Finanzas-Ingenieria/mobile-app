@@ -4,76 +4,91 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/car.dart';
 import '../styles/styles.dart';
 
-class SelectCar extends StatelessWidget {
-  const SelectCar({super.key});
+class SelectCar extends StatefulWidget {
+  final String currency;
+  const SelectCar({
+    super.key,
+    required this.currency,
+  });
 
+  @override
+  State<SelectCar> createState() => _SelectCarState();
+}
+
+class _SelectCarState extends State<SelectCar> {
   @override
   Widget build(BuildContext context) {
     final List<Car> cars = [
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Hyundai 54',
-        color: Colors.blue,
-        price: 25000.0,
+        imagePath: 'assets/images/chevrolet_onix.jpg',
+        name: 'Chevrolet Onix',
+        color: const Color.fromARGB(255, 34, 152, 168),
+        colorName: "Azul",
+        price: 45000,
+        usdPrice: double.parse((45000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 2',
+        imagePath: 'assets/images/DFSK_Glory_580.png',
+        name: 'DFSK Glory 580',
         color: Colors.red,
-        price: 30000.0,
+        colorName: "Rojo",
+        price: 43000,
+        usdPrice: double.parse((43000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 3',
-        color: Colors.green,
-        price: 35000.0,
+        imagePath: 'assets/images/Geely_GX3.png',
+        name: 'Geely GX3',
+        color: const Color.fromARGB(255, 34, 152, 168),
+        colorName: "Azul",
+        price: 39000,
+        usdPrice: double.parse((39000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 1',
-        color: Colors.blue,
-        price: 25000.0,
+        imagePath: 'assets/images/toyota_hilux.png',
+        name: 'Toyota Hilux',
+        color: const Color.fromARGB(255, 212, 212, 212),
+        colorName: "Plomo",
+        price: 49000,
+        usdPrice: double.parse((49000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 2',
-        color: Colors.red,
-        price: 30000.0,
+        imagePath: 'assets/images/kia_soluto.png',
+        name: 'Kia Soluto',
+        color: const Color.fromARGB(255, 212, 212, 212),
+        colorName: "Plomo",
+        price: 41000,
+        usdPrice: double.parse((41000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 3',
-        color: Colors.green,
-        price: 35000.0,
+        imagePath: 'assets/images/toyota_rush.jpg',
+        color: const Color.fromARGB(255, 212, 212, 212),
+        name: 'Toyota Rush',
+        colorName: "Plomo",
+        price: 47000,
+        usdPrice: double.parse((47000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 1',
-        color: Colors.blue,
-        price: 25000.0,
+        imagePath: 'assets/images/kia_picanto.jpg',
+        name: 'Kia Picanto',
+        color: const Color.fromARGB(255, 212, 212, 212),
+        colorName: "Plomo",
+        price: 43000,
+        usdPrice: double.parse((43000 / 3.8).toStringAsFixed(2)),
       ),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 2',
-        color: Colors.red,
-        price: 30000.0,
-      ),
+          imagePath: 'assets/images/toyota_etios.jpg',
+          name: 'Toyota Etios',
+          color: const Color.fromARGB(255, 43, 43, 43),
+          colorName: "Negro",
+          price: 49700,
+          usdPrice: double.parse((49700 / 3.8).toStringAsFixed(2))),
       Car(
-        imageUrl:
-            'https://w7.pngwing.com/pngs/38/708/png-transparent-car-mercedes-car-love-compact-car-vehicle.png',
-        name: 'Car 3',
-        color: Colors.green,
-        price: 35000.0,
-      ),
-      // Add more cars as needed
+          imagePath: 'assets/images/toyota_yaris.png',
+          name: 'Toyota Yaris',
+          color: Colors.black,
+          colorName: "Negro",
+          price: 46000,
+          usdPrice: double.parse((46000 / 3.8).toStringAsFixed(2))),
     ];
 
     return SafeArea(
@@ -87,7 +102,7 @@ class SelectCar extends StatelessWidget {
                 const SizedBox(height: 60),
                 Center(
                   child: Text(
-                    "Escoja el coche",
+                    "Escoja un Auto",
                     style: GoogleFonts.readexPro(
                       color: tertiaryColor,
                       fontSize: 25,
@@ -120,8 +135,8 @@ class SelectCar extends StatelessWidget {
                       final car = cars[index];
                       return ListTile(
                         leading: Image.network(
-                          car.imageUrl,
-                          width: 80,
+                          car.imagePath,
+                          width: 100,
                           fit: BoxFit.contain,
                         ),
                         title: Text(car.name),
@@ -140,12 +155,21 @@ class SelectCar extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Text("Red"),
+                                Text(car.colorName),
                               ],
                             ),
                             Row(
                               children: [
-                                Text('\$${car.price.toStringAsFixed(2)}'),
+                                Text(
+                                  widget.currency == "SOLES"
+                                      ? "S/ ${car.price}"
+                                      : "\$ ${car.usdPrice.round()}",
+                                  style: GoogleFonts.readexPro(
+                                    color: tertiaryColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                                 const Spacer(),
                                 ElevatedButton(
                                   onPressed: () {

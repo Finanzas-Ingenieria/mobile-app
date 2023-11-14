@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:credito_inteligente/screens/history.dart';
 import 'package:credito_inteligente/screens/home.dart';
 import 'package:credito_inteligente/screens/profile.dart';
@@ -39,72 +37,58 @@ class _MainMenuState extends State<MainMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scrollBehavior: MyCustomScrollBehavior(),
-      debugShowCheckedModeBanner: false,
-      title: 'Crédito Inteligente',
-      home: Scaffold(
-        bottomNavigationBar: MediaQuery.of(context).size.width < 640
-            ? BottomNavigationBar(
-                currentIndex: selectedIndex,
-                unselectedItemColor: const Color.fromARGB(255, 188, 188, 188),
-                selectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-                onTap: (index) => setState(() => selectedIndex = index),
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Inicio',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.history),
-                    label: 'Historial',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Perfil',
-                  ),
-                ],
-              )
-            : null,
-        body: Row(children: [
-          if (MediaQuery.of(context).size.width >= webScreenWidth)
-            NavigationRail(
-              backgroundColor: Colors.white,
-              selectedIconTheme: const IconThemeData(color: Colors.indigo),
-              unselectedIconTheme: const IconThemeData(
-                  color: Color.fromARGB(255, 131, 141, 206)),
-              onDestinationSelected: (index) =>
-                  setState(() => selectedIndex = index),
-              selectedIndex: selectedIndex,
-              destinations: const [
-                NavigationRailDestination(
+    return Scaffold(
+      bottomNavigationBar: MediaQuery.of(context).size.width < 640
+          ? BottomNavigationBar(
+              currentIndex: selectedIndex,
+              unselectedItemColor: const Color.fromARGB(255, 188, 188, 188),
+              selectedItemColor: const Color.fromARGB(255, 255, 255, 255),
+              onTap: (index) => setState(() => selectedIndex = index),
+              items: const [
+                BottomNavigationBarItem(
                   icon: Icon(Icons.home),
-                  label: Text('Inicio'),
+                  label: 'Inicio',
                 ),
-                NavigationRailDestination(
+                BottomNavigationBarItem(
                   icon: Icon(Icons.history),
-                  label: Text('Historial'),
+                  label: 'Historial',
                 ),
-                NavigationRailDestination(
+                BottomNavigationBarItem(
                   icon: Icon(Icons.person),
-                  label: Text('Perfil'),
+                  label: 'Perfil',
                 ),
               ],
-            ),
-          Expanded(
-            child: screens[selectedIndex],
+            )
+          : null,
+      body: Row(children: [
+        if (MediaQuery.of(context).size.width >= webScreenWidth)
+          NavigationRail(
+            backgroundColor: Colors.white,
+            selectedIconTheme: const IconThemeData(color: Colors.indigo),
+            unselectedIconTheme:
+                const IconThemeData(color: Color.fromARGB(255, 131, 141, 206)),
+            onDestinationSelected: (index) =>
+                setState(() => selectedIndex = index),
+            selectedIndex: selectedIndex,
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home),
+                label: Text('Inicio'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.history),
+                label: Text('Historial'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.person),
+                label: Text('Perfil'),
+              ),
+            ],
           ),
-        ]),
-      ),
+        Expanded(
+          child: screens[selectedIndex],
+        ),
+      ]),
     );
   }
-}
-
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
 }

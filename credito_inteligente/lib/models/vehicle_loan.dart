@@ -3,6 +3,7 @@ import 'package:credito_inteligente/models/user.dart';
 
 class VehicleLoan {
   int id;
+  String code;
   Client client;
   User user;
   String currency;
@@ -26,6 +27,7 @@ class VehicleLoan {
 
   VehicleLoan({
     required this.id,
+    required this.code,
     required this.client,
     required this.user,
     required this.currency,
@@ -51,6 +53,7 @@ class VehicleLoan {
   factory VehicleLoan.fromJson(Map<String, dynamic> json) {
     return VehicleLoan(
       id: json['id'],
+      code: json['code'],
       client: Client.fromJson(json['client']),
       user: User.fromJson(json['user']),
       currency: json['currency'],
@@ -76,30 +79,31 @@ class VehicleLoan {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'code': code,
         'client': client.toJson(),
         'user': user.toJson(),
         'currency': currency,
         'startedDate': startedDate,
-        'vehiclePrice': vehiclePrice,
-        'loanPercentage': loanPercentage,
+        'vehiclePrice': vehiclePrice..toStringAsFixed(4),
+        'loanPercentage': loanPercentage.toStringAsFixed(4),
         'rateType': rateType,
-        'rateAmount': rateAmount,
+        'rateAmount': rateAmount..toStringAsFixed(4),
         'rateCapitalization': rateCapitalization,
-        'desgravamenRate': desgravamenRate,
-        'vehicleInsurance': vehicleInsurance,
-        'physicalShipment': physicalShipment,
+        'desgravamenRate': desgravamenRate.toStringAsFixed(6),
+        'vehicleInsurance': vehicleInsurance.toStringAsFixed(6),
+        'physicalShipment': physicalShipment.toStringAsFixed(4),
         'paymentPeriod': paymentPeriod,
         'graceType': graceType,
         'gracePeriod': gracePeriod,
         'lastQuota': lastQuota,
-        'notaryCosts': notaryCosts,
-        'registrationCosts': registrationCosts,
+        'notaryCosts': notaryCosts.toStringAsFixed(4),
+        'registrationCosts': registrationCosts.toStringAsFixed(4),
         'appraisal': appraisal,
-        'administrationCosts': administrationCosts,
+        'administrationCosts': administrationCosts.toStringAsFixed(4),
       };
 
   @override
   String toString() {
-    return 'VehicleLoan{id: $id, client: $client, user: $user, currency: $currency, startedDate: $startedDate, vehiclePrice: $vehiclePrice, loanPercentage: $loanPercentage, rateType: $rateType, rateAmount: $rateAmount,  rateCapitalization: $rateCapitalization ,desgravamenRate: $desgravamenRate, vehicleInsurance: $vehicleInsurance, physicalShipment: $physicalShipment, paymentPeriod: $paymentPeriod, graceType: $graceType, gracePeriod: $gracePeriod, lastQuota: $lastQuota, notaryCosts: $notaryCosts, registrationCosts: $registrationCosts, appraisal: $appraisal, administrationCosts: $administrationCosts}';
+    return 'VehicleLoan{id: $id, code: $code, client: $client, user: $user, currency: $currency, startedDate: $startedDate, vehiclePrice: $vehiclePrice, loanPercentage: $loanPercentage, rateType: $rateType, rateAmount: $rateAmount,  rateCapitalization: $rateCapitalization ,desgravamenRate: $desgravamenRate, vehicleInsurance: $vehicleInsurance, physicalShipment: $physicalShipment, paymentPeriod: $paymentPeriod, graceType: $graceType, gracePeriod: $gracePeriod, lastQuota: $lastQuota, notaryCosts: $notaryCosts, registrationCosts: $registrationCosts, appraisal: $appraisal, administrationCosts: $administrationCosts}';
   }
 }

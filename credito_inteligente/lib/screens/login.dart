@@ -1,5 +1,5 @@
+import 'package:credito_inteligente/screens/buscar_plan_pago.dart';
 import 'package:credito_inteligente/screens/login2.dart';
-import 'package:credito_inteligente/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:credito_inteligente/styles/styles.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,7 +40,7 @@ class Login extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CustomButton(
-                    text: "Iniciar Sesión",
+                    text: "Quiero Unirme",
                     buttonColor: primaryColor,
                     textColor: textColor,
                     width: screenWidth * 0.45,
@@ -49,15 +49,15 @@ class Login extends StatelessWidget {
                           builder: (context) => const Login2()));
                     },
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   CustomButton(
-                    text: "Registrarse",
+                    text: "Ver mi plan de pagos",
                     buttonColor: textColor,
                     textColor: homeTextColor,
                     width: screenWidth * 0.45,
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const Register()));
+                          builder: (context) => const BuscarPlanPago()));
                     },
                   )
                 ],

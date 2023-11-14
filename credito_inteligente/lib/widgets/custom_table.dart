@@ -190,7 +190,8 @@ class _CustomTableState extends State<CustomTable> {
           color: backgroundColor,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('${entry.value}',
+            child: Text(
+                '${entry.key > 2 ? entry.value.toStringAsFixed(2) : entry.value}',
                 style: GoogleFonts.roboto(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,

@@ -25,7 +25,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final List<String> currencies = ['SOLES', 'DÓLARES'];
   final List<String> rateTypes = ['TEA', 'TNA'];
-  double ratePercentage = 3.42;
+  double ratePercentage = 0;
 
   String selectedCurrency = 'SOLES';
   String selectedRate = 'TEA';
@@ -276,6 +276,14 @@ class _HomeState extends State<Home> {
     return newDate;
   }
 
+  String getVehiculeLoanCode(String clientName, String clientLastName) {
+    String day = DateFormat('dd').format(addOneDay());
+    clientName = clientName.toUpperCase();
+    clientLastName = clientLastName.toUpperCase()[0];
+    String code = 'PG-$day$clientName$clientLastName';
+    return code;
+  }
+
   void validateData() {
     //validate data
     bool gracePeriodIsValid = false;
@@ -306,6 +314,7 @@ class _HomeState extends State<Home> {
       //create new vehicle loan
       VehicleLoan newVehicleLoan = VehicleLoan(
           id: 0,
+          code: getVehiculeLoanCode(clientName, clientLastName),
           client: newClient,
           currency: selectedCurrency == 'DÓLARES' ? 'USD' : 'PEN',
           loanPercentage: selectedLoanPercentage.toDouble() / 100,
@@ -353,6 +362,16 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          title: Text(
+            'Crédito Vehicular Compra Inteligente',
+            style: GoogleFonts.readexPro(
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
         body: ListView(
           children: [
             Container(
@@ -363,14 +382,14 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
-                      height: 60,
+                      height: 50,
                     ),
                     Text(
-                      "Crédito Vehicular\nCompra Inteligente",
+                      "Crear Plan de Pago",
                       style: GoogleFonts.readexPro(
                           color: tertiaryColor,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w500),
+                          fontSize: 25,
+                          fontWeight: FontWeight.w400),
                     ),
                     const SizedBox(height: 30),
                     Text("Datos del Cliente",
@@ -483,14 +502,17 @@ class _HomeState extends State<Home> {
                             Car? selectedCar =
                                 await Navigator.of(context).push<Car>(
                               MaterialPageRoute(
-                                builder: (context) => const SelectCar(),
+                                builder: (context) =>
+                                    SelectCar(currency: selectedCurrency),
                               ),
                             );
 
                             if (selectedCar != null) {
-                              print("ICUUUU");
                               setState(() {
-                                currentVehicleValue = selectedCar.price.toInt();
+                                currentVehicleValue =
+                                    selectedCurrency == 'DÓLARES'
+                                        ? selectedCar.usdPrice.round()
+                                        : selectedCar.price.round();
                                 vehicleValueController.text =
                                     currentVehicleValue.toString();
                               });

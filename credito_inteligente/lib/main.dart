@@ -1,5 +1,6 @@
-import 'package:credito_inteligente/models/user.dart';
-import 'package:credito_inteligente/screens/main_menu.dart';
+import 'dart:ui';
+
+import 'package:credito_inteligente/screens/login.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,15 +18,18 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         title: 'Crédito Inteligente',
-        home: MainMenu(
-          user: User(
-              id: 1,
-              name: "name",
-              lastname: "lastname",
-              email: "email",
-              password: "password"),
-        ));
+        home: const Login());
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }

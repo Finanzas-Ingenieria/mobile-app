@@ -1,3 +1,5 @@
+import 'package:credito_inteligente/screens/login.dart';
+import 'package:credito_inteligente/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/user.dart';
@@ -18,7 +20,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 80, 101, 218),
+        backgroundColor: primaryColor,
         title: Text(
           'Your Profile',
           style: GoogleFonts.readexPro(
@@ -26,6 +28,19 @@ class _ProfileState extends State<Profile> {
             fontWeight: FontWeight.w400,
           ),
         ),
+        //create a back lo login button in the right side of the app bar
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 35),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Login()));
+              },
+              icon: const Icon(Icons.logout),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Card(

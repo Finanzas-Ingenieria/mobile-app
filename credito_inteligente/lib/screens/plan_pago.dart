@@ -64,6 +64,7 @@ class _PlanDePagoState extends State<PlanDePago> {
   late double TIR;
   late double TCEA;
   double finalQuoton = 0;
+  int fixedDecimals = 16;
 
   double getFlow() {
     return widget.vehicleLoan.vehiclePrice -
@@ -85,7 +86,7 @@ class _PlanDePagoState extends State<PlanDePago> {
       }
     }
 
-    return double.parse(innerRate.toStringAsFixed(5));
+    return double.parse(innerRate.toStringAsFixed(fixedDecimals));
   }
 
   double convertToMonthlyRate(double rate) {
@@ -94,7 +95,7 @@ class _PlanDePagoState extends State<PlanDePago> {
 
   String getLastQuotaMessage(type) {
     finalQuotaAndAppraisalCost =
-        double.parse(finalQuotaAndAppraisalCost.toStringAsFixed(2));
+        double.parse(finalQuotaAndAppraisalCost.toStringAsFixed(fixedDecimals));
     if (type == "RENOVAR") {
       //limitate to 2 decimals
       return "Tienes un saldo a Favor de $finalQuotaAndAppraisalCost";
@@ -198,7 +199,7 @@ class _PlanDePagoState extends State<PlanDePago> {
             pow(1 + rateMonthlyPercentage + desgravamenRatePercentage,
                 month + 1));
 
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
 
     return resultado;
   }
@@ -262,10 +263,10 @@ class _PlanDePagoState extends State<PlanDePago> {
                 (higherPercentageVNAValue - lowerPercentageVNAValue)) +
             iHigherPercentage;
 
-    tir = double.parse(tir.toStringAsFixed(5));
+    tir = double.parse(tir.toStringAsFixed(fixedDecimals));
 
     double tcea = pow(1 + tir, 12) - 1;
-    tcea = double.parse(tcea.toStringAsFixed(2));
+    tcea = double.parse(tcea.toStringAsFixed(fixedDecimals));
 
     setState(() {
       TIR = tir;
@@ -277,13 +278,13 @@ class _PlanDePagoState extends State<PlanDePago> {
       double vehiclePrice, double vehicleInsurancePercentage) {
     double resultado = vehicleInsurancePercentage * vehiclePrice / 12;
 
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
 
     return resultado;
   }
 
   void savePaymentPlan() {
-    VehicleLoanService().createVehicleLoan(vehicleLoan).then((value) => {
+    VehicleLoanService().createVehicleLoan(widget.vehicleLoan).then((value) => {
           if (value != null)
             {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -300,12 +301,12 @@ class _PlanDePagoState extends State<PlanDePago> {
                       bottom: MediaQuery.of(context).size.height * 0.78),
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  duration: const Duration(seconds: 4),
+                  duration: const Duration(seconds: 3),
                 ),
               ),
 
               //waiut for 3 seconds
-              Future.delayed(const Duration(seconds: 6), () {
+              Future.delayed(const Duration(seconds: 5), () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -355,7 +356,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                   -(paymentPeriod - lastMonth)));
 
       // Limitar a 3 decimales
-      resultado = double.parse(resultado.toStringAsFixed(3));
+      resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
       return resultado;
     }
   }
@@ -364,7 +365,7 @@ class _PlanDePagoState extends State<PlanDePago> {
     double resultado = finalCapital * rateAmount;
 
     // Limitar a 3 decimales
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
     return resultado;
   }
 
@@ -372,7 +373,7 @@ class _PlanDePagoState extends State<PlanDePago> {
     double resultado = finalCapital * desgravamenRate;
 
     // Limitar a 3 decimales
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
     return resultado;
   }
 
@@ -382,7 +383,7 @@ class _PlanDePagoState extends State<PlanDePago> {
       double resultado = quota - interest - lifeEnsurance;
 
       // Limitar a 3 decimales
-      resultado = double.parse(resultado.toStringAsFixed(3));
+      resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
       return resultado;
     } else {
       return 0;
@@ -396,7 +397,7 @@ class _PlanDePagoState extends State<PlanDePago> {
     } else {
       double resultado = initialCapital - amortization;
 
-      resultado += 0.1; //TO ROUND UP
+      //resultado += 0.1; //TO ROUND UP
 
       // Limitar a 3 decimales
       resultado = double.parse(resultado.toStringAsFixed(0));
@@ -414,7 +415,7 @@ class _PlanDePagoState extends State<PlanDePago> {
     }
 
     // Limitar a 3 decimales
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
     return resultado;
   }
 
@@ -423,7 +424,7 @@ class _PlanDePagoState extends State<PlanDePago> {
     double resultado = (amount /
         pow(1 + rateMonthlyPercentage + desgravamenRatePercentage, n + 1));
 
-    resultado = double.parse(resultado.toStringAsFixed(2));
+    resultado = double.parse(resultado.toStringAsFixed(fixedDecimals));
 
     return resultado;
   }
@@ -450,7 +451,7 @@ class _PlanDePagoState extends State<PlanDePago> {
               paymentPeriod,
               rows.last.month,
               getGracePeriodType(rows.last.month + 1))
-          .toStringAsFixed(1));
+          .toStringAsFixed(fixedDecimals));
 
       double newAmortization = calculateAmortization(newQuota, newInterest,
           newLifeEnsurance, getGracePeriodType(rows.last.month + 1));
@@ -458,12 +459,14 @@ class _PlanDePagoState extends State<PlanDePago> {
       double fcInitialamount = rows.last.month == 0
           ? getCurrentFinalQuotaValue(finalQuota, rateMonthlyPercentage,
               desgravamenRatePercentage, paymentPeriod)
-          : double.parse(rows.last.fc_finalAmount.toStringAsFixed(2));
+          : double.parse(
+              rows.last.fc_finalAmount.toStringAsFixed(fixedDecimals));
 
-      double fcInterest = double.parse(
-          (fcInitialamount * rateMonthlyPercentage).toStringAsFixed(2));
+      double fcInterest = double.parse((fcInitialamount * rateMonthlyPercentage)
+          .toStringAsFixed(fixedDecimals));
       double fcLifeEnsurance = double.parse(
-          (fcInitialamount * desgravamenRatePercentage).toStringAsFixed(2));
+          (fcInitialamount * desgravamenRatePercentage)
+              .toStringAsFixed(fixedDecimals));
 
       if (i <= paymentPeriod) {
         rows.add(PlanPagoRow(
@@ -479,7 +482,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                       fcLifeEnsurance)
                   .abs())
               .toStringAsFixed(
-                  2)), // we dont extract amortization due to it is not calculated yet, in 37 row still
+                  fixedDecimals)), // we dont extract amortization due to it is not calculated yet, in 37 row still
           initialAmount: newInitialCapital,
           interestAmount: newInterest,
           quota: newQuota,
@@ -501,7 +504,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                       newAmortization,
                       getGracePeriodType(rows.last.month + 1),
                       newInterest)
-                  .toStringAsFixed(2)),
+                  .toStringAsFixed(fixedDecimals)),
           flow: double.parse(calculateFlow(
             newQuota,
             vehicleInsuranceAmount,
@@ -509,13 +512,13 @@ class _PlanDePagoState extends State<PlanDePago> {
             administativeCost,
             getGracePeriodType(rows.last.month + 1),
             newLifeEnsurance,
-          ).toStringAsFixed(1)),
+          ).toStringAsFixed(fixedDecimals)),
         ));
       } else {
         // quota 25 or 37
         double fcAmortization = double.parse(
             (fcInitialamount + fcInterest + fcLifeEnsurance)
-                .toStringAsFixed(2));
+                .toStringAsFixed(fixedDecimals));
 
         double lastQuota = double.parse((calculateFlow(
                     0,
@@ -525,7 +528,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                     getGracePeriodType(rows.last.month + 1),
                     newLifeEnsurance) +
                 fcAmortization)
-            .toStringAsFixed(1));
+            .toStringAsFixed(fixedDecimals));
 
         setState(() {
           finalQuotaAndAppraisalCost =
@@ -543,7 +546,7 @@ class _PlanDePagoState extends State<PlanDePago> {
           fc_lifeEnsurance: fcLifeEnsurance,
           fc_finalAmount: double.parse(
               (fcInitialamount + fcInterest + fcLifeEnsurance - fcAmortization)
-                  .toStringAsFixed(2)),
+                  .toStringAsFixed(fixedDecimals)),
           initialAmount: newInitialCapital,
           interestAmount: newInterest,
           quota: 0,
@@ -561,7 +564,7 @@ class _PlanDePagoState extends State<PlanDePago> {
         ));
 
         double van = calculateVAN(rows, 3.43661 / 100);
-        van = double.parse(van.toStringAsFixed(2));
+        van = double.parse(van.toStringAsFixed(fixedDecimals));
 
         setState(() {
           VAN = van;

@@ -64,6 +64,16 @@ class _HistoryState extends State<History> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          title: Text(
+            'Planes de Pago Generados',
+            style: GoogleFonts.readexPro(
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -71,17 +81,6 @@ class _HistoryState extends State<History> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 60),
-                Center(
-                  child: Text(
-                    "Historial",
-                    style: GoogleFonts.readexPro(
-                      color: tertiaryColor,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
                 Text(
                   "Planes generados",
                   style: GoogleFonts.readexPro(

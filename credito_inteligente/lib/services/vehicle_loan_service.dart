@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:credito_inteligente/models/client.dart';
+import 'package:credito_inteligente/models/user.dart';
+
 import '../models/vehicle_loan.dart';
 import 'package:http/http.dart' as http;
 
@@ -57,6 +60,54 @@ class VehicleLoanService {
             .toList();
       } else if (response.statusCode == 204) {
         return [];
+      } else {
+        throw Exception(
+            'Failed to fetch vehicleLoans data. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch vehicleLoans data. Error: $e');
+    }
+  }
+
+  //get vehicleLoans by code
+  //this is the endpoint http://localhost:8090/api/vehicleLoans/code/{code}
+  Future<VehicleLoan> getVehicleLoansByCode(String code) async {
+    final url = Uri.parse('$baseUrl/code/$code');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'content-type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+        return VehicleLoan.fromJson(jsonData);
+      } else if (response.statusCode == 404) {
+        return VehicleLoan(
+          id: 0,
+          code: '',
+          client: Client(id: 0, name: "", lastname: ""),
+          user: User(id: 0, name: "", lastname: "", email: "", password: ""),
+          currency: '',
+          startedDate: '',
+          vehiclePrice: 0,
+          loanPercentage: 0,
+          rateType: '',
+          rateAmount: 0,
+          rateCapitalization: '',
+          desgravamenRate: 0,
+          vehicleInsurance: 0,
+          physicalShipment: 0,
+          paymentPeriod: 0,
+          graceType: '',
+          gracePeriod: 0,
+          lastQuota: '',
+          notaryCosts: 0,
+          registrationCosts: 0,
+          appraisal: 0,
+          administrationCosts: 0,
+        );
       } else {
         throw Exception(
             'Failed to fetch vehicleLoans data. Status code: ${response.statusCode}');
