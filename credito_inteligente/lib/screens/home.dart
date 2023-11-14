@@ -282,7 +282,7 @@ class _HomeState extends State<Home> {
     if (selectedGracePeriod != "Ninguno" &&
         (gracePeriod > 0 && gracePeriod <= 6)) {
       gracePeriodIsValid = true;
-    } else {
+    } else if (selectedGracePeriod == "Ninguno") {
       gracePeriodIsValid = true;
     }
 

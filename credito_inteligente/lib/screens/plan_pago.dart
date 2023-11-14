@@ -30,13 +30,6 @@ class _PlanDePagoState extends State<PlanDePago> {
   late PlanPago planPago;
   late VehicleLoan vehicleLoan;
 
-  double getFlow() {
-    return widget.vehicleLoan.vehiclePrice -
-        0.2 * widget.vehicleLoan.vehiclePrice +
-        widget.vehicleLoan.notaryCosts +
-        widget.vehicleLoan.registrationCosts;
-  }
-
   //DTA FROM OTHER SCREEN
 
   //Create basic data
@@ -65,6 +58,19 @@ class _PlanDePagoState extends State<PlanDePago> {
   late double vehicleInsuranceAmount;
   late int gracePeriod;
   late String graceType;
+  late double finalQuotaAndAppraisalCost;
+  late double depreciationRate;
+  late double VAN;
+  late double TIR;
+  late double TCEA;
+  double finalQuoton = 0;
+
+  double getFlow() {
+    return widget.vehicleLoan.vehiclePrice -
+        0.2 * widget.vehicleLoan.vehiclePrice +
+        widget.vehicleLoan.notaryCosts +
+        widget.vehicleLoan.registrationCosts;
+  }
 
   double convertToMonthlyRate(double rate) {
     if (rateType == 'TEA') {
@@ -75,24 +81,39 @@ class _PlanDePagoState extends State<PlanDePago> {
   }
 
   String getLastQuotaMessage(type) {
+    finalQuotaAndAppraisalCost =
+        double.parse(finalQuotaAndAppraisalCost.toStringAsFixed(2));
     if (type == "RENOVAR") {
-      return "Tienes un saldo a Favor de S/ 1,000.00";
+      //limitate to 2 decimals
+      return "Tienes un saldo a Favor de $finalQuotaAndAppraisalCost";
     } else if (type == "QUEDAR") {
-      return "Valor del último Cuoton S/ 1,000.00";
+      return "Valor del Cuotón Final $finalQuoton";
     } else {
-      return "Tienes un saldo a Favor de S/ 200";
+      return "Tienes un saldo a Favor de $finalQuotaAndAppraisalCost";
     }
+  }
+
+  String addOneDayToCurrentDate() {
+    DateTime currentDate = DateTime.now();
+
+    DateTime newDate =
+        DateTime(currentDate.year, currentDate.month, currentDate.day + 1);
+
+    String formattedDate = DateFormat('dd/MM/yyyy').format(newDate);
+
+    return formattedDate;
   }
 
   @override
   void initState() {
     super.initState();
 
+    vehicleLoan = widget.vehicleLoan;
     rows = [
       PlanPagoRow(
           month: 0,
           gracePeriod: '',
-          date: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+          date: addOneDayToCurrentDate(),
           fc_initialAmount: 0,
           fc_interest: 0,
           fc_amortization: 0,
@@ -110,7 +131,6 @@ class _PlanDePagoState extends State<PlanDePago> {
           flow: getFlow())
     ];
 
-    vehicleLoan = widget.vehicleLoan;
     planPago = PlanPago(planPagoRows: rows, vehicleLoan: vehicleLoan);
 
     //DATA FROM OTHER SCREEN
@@ -147,6 +167,11 @@ class _PlanDePagoState extends State<PlanDePago> {
 
     planPago = planPago;
     rows = planPago.planPagoRows;
+    depreciationRate = planPago.vehicleLoan.paymentPeriod == 24 ? 0.3 : 0.45;
+    finalQuotaAndAppraisalCost = 0;
+    VAN = 0;
+    TIR = 0;
+    TCEA = 0;
     generateRows();
   }
 
@@ -164,6 +189,76 @@ class _PlanDePagoState extends State<PlanDePago> {
     resultado = double.parse(resultado.toStringAsFixed(5));
 
     return resultado;
+  }
+
+  double calculateVAN(List<PlanPagoRow> myRows, double cok) {
+    double VNA = 0;
+    double VNAi = 0;
+    double COK = cok;
+    for (int i = 1; i < myRows.length; i++) {
+      VNAi = myRows[i].flow / pow(1 + COK, i);
+      VNA += VNAi;
+    }
+
+    double VAN = -(VNA - myRows[0].flow);
+    print("VAN: $VAN");
+
+    return VAN;
+  }
+
+  void calculateTIR(List<PlanPagoRow> myRows) {
+    double numberOfChange = 0.001;
+    double currentIteracionPercentage = 0;
+    double currentVNAValue = calculateVAN(myRows, currentIteracionPercentage);
+    double iHigherPercentage = 0;
+    double iLowerPercentage = 0;
+    double higherPercentageVNAValue = 0;
+    double lowerPercentageVNAValue = 0;
+
+    if (currentVNAValue > 0) {
+      while (currentVNAValue > 0) {
+        currentIteracionPercentage -= numberOfChange;
+        currentVNAValue = calculateVAN(myRows, currentIteracionPercentage);
+      }
+
+      iHigherPercentage = currentIteracionPercentage + numberOfChange;
+      higherPercentageVNAValue = calculateVAN(myRows, iHigherPercentage);
+
+      iLowerPercentage = currentIteracionPercentage;
+      lowerPercentageVNAValue = currentVNAValue;
+    } else {
+      while (currentVNAValue < 0) {
+        currentIteracionPercentage += numberOfChange;
+        currentVNAValue = calculateVAN(myRows, currentIteracionPercentage);
+      }
+
+      iHigherPercentage = currentIteracionPercentage;
+      higherPercentageVNAValue = currentVNAValue;
+
+      //find lower percentage
+      while (currentVNAValue > 0) {
+        currentIteracionPercentage -= numberOfChange;
+        currentVNAValue = calculateVAN(myRows, currentIteracionPercentage);
+      }
+
+      iLowerPercentage = currentIteracionPercentage;
+      lowerPercentageVNAValue = currentVNAValue;
+    }
+
+    double tir =
+        -(((iHigherPercentage - iLowerPercentage) * higherPercentageVNAValue) /
+                (higherPercentageVNAValue - lowerPercentageVNAValue)) +
+            iHigherPercentage;
+
+    tir = double.parse(tir.toStringAsFixed(5));
+
+    double tcea = pow(1 + tir, 12) - 1;
+    tcea = double.parse(tcea.toStringAsFixed(5));
+
+    setState(() {
+      TIR = tir;
+      TCEA = tcea;
+    });
   }
 
   double getVehicleInsuranceAmount(
@@ -316,8 +411,6 @@ class _PlanDePagoState extends State<PlanDePago> {
 
     resultado = double.parse(resultado.toStringAsFixed(5));
 
-    print("resultado: $resultado");
-
     return resultado;
   }
 
@@ -367,8 +460,11 @@ class _PlanDePagoState extends State<PlanDePago> {
           fc_interest: fcInterest,
           fc_amortization: 0,
           fc_lifeEnsurance: fcLifeEnsurance,
-          fc_finalAmount: double.parse(
-              (fcInitialamount + fcInterest + fcLifeEnsurance).toStringAsFixed(
+          fc_finalAmount: double.parse(((fcInitialamount +
+                      fcInterest +
+                      fcLifeEnsurance)
+                  .abs())
+              .toStringAsFixed(
                   2)), // we dont extract amortization due to it is not calculated yet, in 37 row still
           initialAmount: newInitialCapital,
           interestAmount: newInterest,
@@ -403,6 +499,22 @@ class _PlanDePagoState extends State<PlanDePago> {
             (fcInitialamount + fcInterest + fcLifeEnsurance)
                 .toStringAsFixed(5));
 
+        double lastQuota = double.parse((calculateFlow(
+                    0,
+                    vehicleInsuranceAmount,
+                    physicalShipment,
+                    administativeCost,
+                    getGracePeriodType(rows.last.month + 1),
+                    newLifeEnsurance) +
+                fcAmortization)
+            .toStringAsFixed(1));
+
+        setState(() {
+          finalQuotaAndAppraisalCost =
+              vehiclePrice * (1 - depreciationRate) - lastQuota;
+          finalQuoton = lastQuota;
+        });
+
         rows.add(PlanPagoRow(
           month: i,
           gracePeriod: getGracePeriodType(rows.last.month),
@@ -427,16 +539,16 @@ class _PlanDePagoState extends State<PlanDePago> {
               0,
               getGracePeriodType(rows.last.month + 1),
               newInterest), //actualizar para plazo TGracias otal
-          flow: double.parse((calculateFlow(
-                      0,
-                      vehicleInsuranceAmount,
-                      physicalShipment,
-                      administativeCost,
-                      getGracePeriodType(rows.last.month + 1),
-                      newLifeEnsurance) +
-                  fcAmortization)
-              .toStringAsFixed(1)),
+          flow: lastQuota,
         ));
+
+        double van = calculateVAN(rows, 3.43661 / 100);
+        van = double.parse(van.toStringAsFixed(2));
+
+        setState(() {
+          VAN = van;
+        });
+        calculateTIR(rows);
       }
     }
   }
@@ -467,7 +579,7 @@ class _PlanDePagoState extends State<PlanDePago> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   Text(
                     "Datos del Cliente",
                     style: GoogleFonts.readexPro(
@@ -502,35 +614,41 @@ class _PlanDePagoState extends State<PlanDePago> {
                             (widget.vehicleLoan.vehiclePrice * 0.2).toString()),
                         buildTableRow("${widget.vehicleLoan.rateType}:",
                             "${widget.vehicleLoan.rateAmount * 100}%"),
-                        buildTableRow("TCEA:", "35.32%"),
-                        buildTableRow("VAN:", "12345"),
-                        buildTableRow("TIR:", "35.32%"),
+                        buildTableRow("VAN:", VAN.toString()),
+                        buildTableRow("TIR:", "${TIR * 100}%"),
+                        buildTableRow("TCEA:", "${TCEA * 100}%"),
                         buildTableRow("Fecha de inicio: ",
                             widget.vehicleLoan.startedDate),
                         buildTableRow("Periodo de Pago: ",
-                            widget.vehicleLoan.paymentPeriod.toString()),
+                            "${widget.vehicleLoan.paymentPeriod} meses"),
+                        buildTableRow("Porcentaje de Depreciación: ",
+                            "${depreciationRate * 100} %")
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  Text(
-                    "Última Cuota: ${widget.vehicleLoan.lastQuota}",
-                    style: GoogleFonts.readexPro(
-                      color: tertiaryColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    getLastQuotaMessage(widget.vehicleLoan.lastQuota),
-                    style: GoogleFonts.readexPro(
-                      color: homeInputFileTextColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 20),
+                  widget.fromHistory
+                      ? Column(children: [
+                          Text(
+                            "Última Cuota: ${widget.vehicleLoan.lastQuota}",
+                            style: GoogleFonts.readexPro(
+                              color: tertiaryColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            getLastQuotaMessage(widget.vehicleLoan.lastQuota),
+                            style: GoogleFonts.readexPro(
+                              color: homeInputFileTextColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ])
+                      : Container(),
+                  const SizedBox(height: 40),
                   Center(
                     child: CustomButton(
                       width: MediaQuery.of(context).size.width * 0.5,

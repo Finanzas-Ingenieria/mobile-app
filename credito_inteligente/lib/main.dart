@@ -1,4 +1,5 @@
-import 'package:credito_inteligente/screens/login.dart';
+import 'package:credito_inteligente/models/user.dart';
+import 'package:credito_inteligente/screens/main_menu.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,9 +16,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Crédito Inteligente',
-        home: Login());
+        home: MainMenu(
+          user: User(
+              id: 1,
+              name: "name",
+              lastname: "lastname",
+              email: "email",
+              password: "password"),
+        ));
   }
 }
