@@ -51,6 +51,7 @@ class _HomeState extends State<Home> {
   String selectedGracePeriod = 'Ninguno';
   String selectedLastQuota = 'Se renovará el vehículo';
   int selectedLoanPercentage = 30;
+  String selectedTNACapitalization = 'Diaria';
 
   final TextEditingController vehicleValueController = TextEditingController();
   final TextEditingController initialQuotaController = TextEditingController();
@@ -311,6 +312,7 @@ class _HomeState extends State<Home> {
           startedDate: DateFormat('dd/MM/yyyy').format(addOneDay()),
           vehiclePrice: currentVehicleValue.toDouble(),
           rateAmount: rateAmount / 100,
+          rateCapitalization: selectedTNACapitalization,
           desgravamenRate: desgravamentMontlyRate / 100,
           vehicleInsurance: vehicleInsuranceAnnualRate / 100,
           physicalShipment: physicalShipment,
@@ -726,6 +728,74 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
+                    selectedRate == 'TNA'
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 15),
+                              Text("Perido de Capitalización",
+                                  style: GoogleFonts.readexPro(
+                                      color: tertiaryColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  // Radio button for 2 meses
+                                  Row(
+                                    children: [
+                                      Radio(
+                                        value: "Diaria",
+                                        groupValue: selectedTNACapitalization,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedTNACapitalization = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        "Diaria",
+                                        style: GoogleFonts.readexPro(
+                                          color: selectedTNACapitalization ==
+                                                  "Diaria"
+                                              ? primaryColor
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  // Radio button for 3 meses
+                                  Row(
+                                    children: [
+                                      Radio(
+                                        value: "Mensual",
+                                        groupValue: selectedTNACapitalization,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedTNACapitalization = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        "Mensual",
+                                        style: GoogleFonts.readexPro(
+                                          color: selectedTNACapitalization ==
+                                                  "Mensual"
+                                              ? primaryColor
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          )
+                        : Container(),
                     const SizedBox(height: 30),
                     Text("Seguro desgravament Mensual (%)",
                         style: GoogleFonts.readexPro(
