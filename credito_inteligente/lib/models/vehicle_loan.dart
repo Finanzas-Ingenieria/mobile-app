@@ -15,6 +15,7 @@ class VehicleLoan {
   String rateCapitalization;
   double desgravamenRate;
   double vehicleInsurance;
+  double annualCok;
   double physicalShipment;
   int paymentPeriod;
   String graceType;
@@ -39,6 +40,7 @@ class VehicleLoan {
     required this.rateCapitalization,
     required this.desgravamenRate,
     required this.vehicleInsurance,
+    required this.annualCok,
     required this.physicalShipment,
     required this.paymentPeriod,
     required this.graceType,
@@ -65,6 +67,7 @@ class VehicleLoan {
       rateCapitalization: json['rateCapitalization'],
       desgravamenRate: json['desgravamenRate'],
       vehicleInsurance: json['vehicleInsurance'],
+      annualCok: json['annualCok'],
       physicalShipment: json['physicalShipment'],
       paymentPeriod: json['paymentPeriod'],
       graceType: json['graceType'],
@@ -91,6 +94,7 @@ class VehicleLoan {
         'rateCapitalization': rateCapitalization,
         'desgravamenRate': desgravamenRate.toStringAsFixed(6),
         'vehicleInsurance': vehicleInsurance.toStringAsFixed(6),
+        'annualCok': annualCok.toStringAsFixed(6),
         'physicalShipment': physicalShipment.toStringAsFixed(4),
         'paymentPeriod': paymentPeriod,
         'graceType': graceType,
@@ -104,6 +108,32 @@ class VehicleLoan {
 
   @override
   String toString() {
-    return 'VehicleLoan{id: $id, code: $code, client: $client, user: $user, currency: $currency, startedDate: $startedDate, vehiclePrice: $vehiclePrice, loanPercentage: $loanPercentage, rateType: $rateType, rateAmount: $rateAmount,  rateCapitalization: $rateCapitalization ,desgravamenRate: $desgravamenRate, vehicleInsurance: $vehicleInsurance, physicalShipment: $physicalShipment, paymentPeriod: $paymentPeriod, graceType: $graceType, gracePeriod: $gracePeriod, lastQuota: $lastQuota, notaryCosts: $notaryCosts, registrationCosts: $registrationCosts, appraisal: $appraisal, administrationCosts: $administrationCosts}';
+    return 'VehicleLoan{id: $id, code: $code, client: $client, user: $user, currency: $currency, startedDate: $startedDate, vehiclePrice: $vehiclePrice, loanPercentage: $loanPercentage, rateType: $rateType, rateAmount: $rateAmount,  rateCapitalization: $rateCapitalization ,desgravamenRate: $desgravamenRate, vehicleInsurance: $vehicleInsurance, annualCok: $annualCok, physicalShipment: $physicalShipment, paymentPeriod: $paymentPeriod, graceType: $graceType, gracePeriod: $gracePeriod, lastQuota: $lastQuota, notaryCosts: $notaryCosts, registrationCosts: $registrationCosts, appraisal: $appraisal, administrationCosts: $administrationCosts}';
   }
+
+  //.empty constructor
+  VehicleLoan.empty()
+      : id = 0,
+        code = '',
+        client = Client.empty(),
+        user = User.empty(),
+        currency = '',
+        startedDate = '',
+        vehiclePrice = 0,
+        loanPercentage = 0,
+        rateType = '',
+        rateAmount = 0,
+        rateCapitalization = '',
+        desgravamenRate = 0,
+        vehicleInsurance = 0,
+        annualCok = 0,
+        physicalShipment = 0,
+        paymentPeriod = 0,
+        graceType = '',
+        gracePeriod = 0,
+        lastQuota = '',
+        notaryCosts = 0,
+        registrationCosts = 0,
+        appraisal = 0,
+        administrationCosts = 0;
 }

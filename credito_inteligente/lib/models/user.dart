@@ -37,4 +37,16 @@ class User {
       'password': password,
     };
   }
+
+  //empty user
+  static User empty() {
+    return User(
+      id: 0,
+      name: '',
+      lastname: '',
+      email: '',
+      password: '',
+    );
+  }
+
 }

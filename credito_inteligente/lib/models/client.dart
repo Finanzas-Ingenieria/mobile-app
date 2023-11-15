@@ -27,4 +27,13 @@ class Client {
   String toString() {
     return 'Client{id: $id, name: $name, lastname: $lastname}';
   }
+
+  //empty client
+  static Client empty() {
+    return Client(
+      id: 0,
+      name: '',
+      lastname: '',
+    );
+  }
 }

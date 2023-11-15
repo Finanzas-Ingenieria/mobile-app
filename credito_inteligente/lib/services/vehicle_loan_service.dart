@@ -98,6 +98,7 @@ class VehicleLoanService {
           rateCapitalization: '',
           desgravamenRate: 0,
           vehicleInsurance: 0,
+          annualCok: 0,
           physicalShipment: 0,
           paymentPeriod: 0,
           graceType: '',
@@ -114,6 +115,31 @@ class VehicleLoanService {
       }
     } catch (e) {
       throw Exception('Failed to fetch vehicleLoans data. Error: $e');
+    }
+  }
+
+  //update vehicleLoan
+  //endpoint http://localhost:8090/api/vehicleLoans/{vehicleLoanId}
+
+  Future<VehicleLoan> updateVehicleLoan(VehicleLoan vehicleLoan) async {
+    final url = Uri.parse('$baseUrl/${vehicleLoan.id}');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'content-type': 'application/json'},
+        body: jsonEncode(vehicleLoan.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+        return VehicleLoan.fromJson(jsonData);
+      } else {
+        throw Exception(
+            'Failed to update vehicleLoan. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to update vehicleLoan. Error: $e');
     }
   }
 }

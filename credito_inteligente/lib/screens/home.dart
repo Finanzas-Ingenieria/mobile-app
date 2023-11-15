@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import '../models/car.dart';
 import '../models/user.dart';
 import '../models/vehicle_loan.dart';
+import '../services/vehicle_loan_service.dart';
 import '../styles/styles.dart';
 import '../widgets/button.dart';
 import '../widgets/snack_bar.dart';
@@ -69,8 +70,14 @@ class _HomeState extends State<Home> {
   double notaryExpenses = 0;
   double registryExpenses = 0;
   double gracePeriod = 0;
+  double annualCOK = 0;
 
   bool buttonClicked = false;
+  bool editMode = false;
+  VehicleLoan existingVehicleLoan = VehicleLoan.empty();
+  bool existingVehicleLoanFound = false;
+
+  final TextEditingController _codeController = TextEditingController();
 
   bool vehicleValueIsValid(String value) {
     if (value.isEmpty) return false;
@@ -250,6 +257,12 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void updateAnnualCOK(String text) {
+    setState(() {
+      annualCOK = text.isNotEmpty ? double.parse(text) : 0;
+    });
+  }
+
   String getGraceType(String graceType) {
     if (graceType == 'Ninguno') {
       return 'S';
@@ -303,6 +316,7 @@ class _HomeState extends State<Home> {
         vehicleInsuranceAnnualRate > 0 &&
         administrationExpenses > 0 &&
         notaryExpenses > 0 &&
+        mountlyIncome > 0 &&
         registryExpenses > 0 &&
         gracePeriodIsValid) {
       Client newClient = Client(
@@ -324,6 +338,7 @@ class _HomeState extends State<Home> {
           rateCapitalization: selectedTNACapitalization,
           desgravamenRate: desgravamentMontlyRate / 100,
           vehicleInsurance: vehicleInsuranceAnnualRate / 100,
+          annualCok: annualCOK / 100,
           physicalShipment: physicalShipment,
           paymentPeriod: selectedPeriod,
           graceType: getGraceType(selectedGracePeriod),
@@ -341,6 +356,226 @@ class _HomeState extends State<Home> {
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PlanDePago(vehicleLoan: newVehicleLoan)));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: CustomSnackBarContent(
+            mainTile: "Campos Incompletos!",
+            errorText:
+                "Por favor, ingrese todos los datos correctamente para continuar",
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  void _updateExistingVehicleLoanCode(String text) {
+    setState(() {
+      _codeController.text = text;
+    });
+  }
+
+  void searchExistingPaymentPlanByCode() {
+    String code = _codeController.text;
+
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: CustomSnackBarContent(
+            mainTile: "Campo Vacío",
+            errorText: "Por favor ingresa el código del plan de pagos",
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    VehicleLoanService().getVehicleLoansByCode(code).then((vehicleLoans) {
+      if (vehicleLoans.id == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: CustomSnackBarContent(
+              mainTile: "No Encontrado",
+              errorText:
+                  "No se encontró un plan de pagos con el código ingresado",
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      } else {
+        setState(() {
+          existingVehicleLoanFound = true;
+          existingVehicleLoan = vehicleLoans;
+          clientName = existingVehicleLoan.client.name;
+
+          clientLastName = existingVehicleLoan.client.lastname;
+          mountlyIncome = 0;
+          selectedCurrency =
+              existingVehicleLoan.currency == 'USD' ? 'DÓLARES' : 'SOLES';
+          currentVehicleValue = existingVehicleLoan.vehiclePrice.round();
+          vehicleValueController.text = currentVehicleValue.toString();
+          rateAmount = existingVehicleLoan.rateAmount * 100;
+          desgravamentMontlyRate = existingVehicleLoan.desgravamenRate * 100;
+          selectedPeriod = existingVehicleLoan.paymentPeriod;
+          vehicleInsuranceAnnualRate = double.parse(
+              (existingVehicleLoan.vehicleInsurance * 100).toStringAsFixed(3));
+          annualCOK = existingVehicleLoan.annualCok * 100;
+          physicalShipment = existingVehicleLoan.physicalShipment;
+          administrationExpenses = existingVehicleLoan.administrationCosts;
+          notaryExpenses = existingVehicleLoan.notaryCosts;
+          registryExpenses = existingVehicleLoan.registrationCosts;
+          selectedLoanPercentage =
+              (existingVehicleLoan.loanPercentage * 100).round();
+          selectedRate = existingVehicleLoan.rateType;
+          selectedTNACapitalization = existingVehicleLoan.rateCapitalization;
+          selectedGracePeriod = existingVehicleLoan.graceType == 'S'
+              ? 'Ninguno'
+              : existingVehicleLoan.graceType == 'T'
+                  ? 'Total'
+                  : 'Parcial';
+          gracePeriod = existingVehicleLoan.gracePeriod.toDouble();
+          selectedLastQuota = existingVehicleLoan.lastQuota == 'RENOVAR'
+              ? 'Se renovará el vehículo'
+              : existingVehicleLoan.lastQuota == 'QUEDAR'
+                  ? 'Se quedará con el auto'
+                  : 'Devolverá el vehículo';
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const CustomSnackBarContent(
+                topPosition: -5,
+                mainTile: "¡Plan de Pagos Encontrado!",
+                errorText: "Se cargaron los datos del plan de pagos",
+                backgroundColor: Color.fromARGB(255, 63, 118, 195),
+                iconsColor: Color.fromARGB(255, 34, 75, 132),
+              ),
+              behavior: SnackBarBehavior.floating,
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height * 0.78),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        });
+
+        print("Client Name: $clientName");
+      }
+    });
+  }
+
+  void updatePaymentPlan() {
+    //validate data
+    bool gracePeriodIsValid = false;
+
+    if (selectedGracePeriod != "Ninguno" &&
+        (gracePeriod > 0 && gracePeriod <= 6)) {
+      gracePeriodIsValid = true;
+    } else if (selectedGracePeriod == "Ninguno") {
+      gracePeriodIsValid = true;
+    }
+
+    if (clientName.isNotEmpty &&
+        clientLastName.isNotEmpty &&
+        vehicleValueIsValid(changingVehicleValue) &&
+        (rateAmount >= 8 && rateAmount <= 24) &&
+        desgravamentMontlyRate > 0 &&
+        vehicleInsuranceAnnualRate > 0 &&
+        administrationExpenses > 0 &&
+        notaryExpenses > 0 &&
+        registryExpenses > 0 &&
+        gracePeriodIsValid) {
+      Client newClient = Client(
+        id: existingVehicleLoan.client.id,
+        name: existingVehicleLoan.client.name,
+        lastname: existingVehicleLoan.client.lastname,
+      );
+
+      //create new vehicle loan
+      VehicleLoan newVehicleLoan = VehicleLoan(
+          id: existingVehicleLoan.id,
+          code: existingVehicleLoan.code,
+          client: newClient,
+          currency: selectedCurrency == 'DÓLARES' ? 'USD' : 'PEN',
+          loanPercentage: selectedLoanPercentage.toDouble() / 100,
+          startedDate: existingVehicleLoan.startedDate,
+          vehiclePrice: currentVehicleValue.toDouble(),
+          rateAmount: rateAmount / 100,
+          rateCapitalization: selectedTNACapitalization,
+          desgravamenRate: desgravamentMontlyRate / 100,
+          vehicleInsurance: vehicleInsuranceAnnualRate / 100,
+          annualCok: annualCOK / 100,
+          physicalShipment: physicalShipment,
+          paymentPeriod: selectedPeriod,
+          graceType: getGraceType(selectedGracePeriod),
+          gracePeriod: gracePeriod.toInt(),
+          lastQuota: getLastQuota(selectedLastQuota),
+          administrationCosts: administrationExpenses,
+          appraisal: 0,
+          notaryCosts: notaryExpenses,
+          registrationCosts: registryExpenses,
+          rateType: selectedRate,
+          user: widget.user);
+
+      print(newVehicleLoan);
+
+      VehicleLoanService().updateVehicleLoan(newVehicleLoan).then((value) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const CustomSnackBarContent(
+              topPosition: -5,
+              mainTile: "¡Plan de Pagos Actualizado!",
+              errorText: "Se actualizaron los datos del plan de pagos",
+              backgroundColor: Color.fromARGB(255, 63, 118, 195),
+              iconsColor: Color.fromARGB(255, 34, 75, 132),
+            ),
+            behavior: SnackBarBehavior.floating,
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).size.height * 0.78),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        setState(() {
+          clientName = '';
+          clientLastName = '';
+          mountlyIncome = 0;
+          selectedCurrency = 'SOLES';
+          currentVehicleValue = 10000;
+          vehicleValueController.text = currentVehicleValue.toString();
+          rateAmount = 0;
+          desgravamentMontlyRate = 0;
+          vehicleInsuranceAnnualRate = 0;
+          physicalShipment = 0;
+          administrationExpenses = 0;
+          notaryExpenses = 0;
+          registryExpenses = 0;
+          selectedLoanPercentage = 30;
+          selectedRate = 'TEA';
+          selectedTNACapitalization = 'Diaria';
+          selectedGracePeriod = 'Ninguno';
+          gracePeriod = 0;
+          selectedLastQuota = 'Se renovará el vehículo';
+          annualCOK = 0;
+          selectedPeriod = 24;
+          editMode = false;
+          existingVehicleLoanFound = false;
+          existingVehicleLoan = VehicleLoan.empty();
+        });
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -382,14 +617,100 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
-                      height: 50,
+                      height: 45,
                     ),
-                    Text(
-                      "Crear Plan de Pago",
-                      style: GoogleFonts.readexPro(
-                          color: tertiaryColor,
-                          fontSize: 25,
-                          fontWeight: FontWeight.w400),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Crear Plan de Pago",
+                              style: GoogleFonts.readexPro(
+                                  color: const Color.fromARGB(255, 40, 56, 64),
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            //edit icon button
+                            const SizedBox(width: 15),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  editMode = true;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.edit,
+                                color: primaryColor,
+                              ),
+                            ),
+                            //create a clean icon button
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  clientName = '';
+                                  clientLastName = '';
+                                  mountlyIncome = 0;
+                                  selectedCurrency = 'SOLES';
+                                  currentVehicleValue = 10000;
+                                  vehicleValueController.text =
+                                      currentVehicleValue.toString();
+                                  rateAmount = 0;
+                                  desgravamentMontlyRate = 0;
+                                  vehicleInsuranceAnnualRate = 0;
+                                  physicalShipment = 0;
+                                  administrationExpenses = 0;
+                                  notaryExpenses = 0;
+                                  registryExpenses = 0;
+                                  selectedLoanPercentage = 30;
+                                  selectedRate = 'TEA';
+                                  selectedTNACapitalization = 'Diaria';
+                                  selectedGracePeriod = 'Ninguno';
+                                  gracePeriod = 24;
+                                  selectedLastQuota = 'Se renovará el vehículo';
+                                  annualCOK = 0;
+                                  existingVehicleLoanFound = false;
+                                  editMode = false;
+                                  existingVehicleLoan = VehicleLoan.empty();
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.cleaning_services,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        editMode
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  CustomButton(
+                                      buttonHeight: 50,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.1,
+                                      text: "Buscar",
+                                      buttonColor: primaryColor,
+                                      textColor: textColor,
+                                      onPressed: () {
+                                        searchExistingPaymentPlanByCode();
+                                      }),
+                                  const SizedBox(width: 10),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                    child: InputFieldWidget(
+                                        hintText:
+                                            "Ingrese el código del Plan de Pagos",
+                                        onTextChanged:
+                                            _updateExistingVehicleLoanCode),
+                                  ),
+                                ],
+                              )
+                            : Container(),
+                      ],
                     ),
                     const SizedBox(height: 30),
                     Text("Datos del Cliente",
@@ -399,7 +720,9 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 24),
                     InputFieldWidget(
-                        hintText: "Nombres", onTextChanged: updateClientName),
+                        hintText:
+                            existingVehicleLoanFound ? clientName : "Nombres",
+                        onTextChanged: updateClientName),
                     const SizedBox(height: 5),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                       Text("Ingrese un nombre válido",
@@ -413,7 +736,9 @@ class _HomeState extends State<Home> {
                     ]),
                     const SizedBox(height: 11),
                     InputFieldWidget(
-                        hintText: "Apellidos",
+                        hintText: existingVehicleLoanFound
+                            ? clientLastName
+                            : "Apellidos",
                         onTextChanged: updateClientLastName),
                     const SizedBox(height: 5),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -426,7 +751,7 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 39),
+                    const SizedBox(height: 30),
                     Text("Moneda",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -735,7 +1060,9 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 20),
                     InputFieldWidget(
-                        hintText: "0 %",
+                        hintText: existingVehicleLoanFound
+                            ? rateAmount.toString()
+                            : "0 %",
                         onTextChanged: updateAnnualRate,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -818,7 +1145,7 @@ class _HomeState extends State<Home> {
                             ],
                           )
                         : Container(),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     Text("Seguro desgravament Mensual (%)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -826,7 +1153,9 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "0 %",
+                        hintText: existingVehicleLoanFound
+                            ? desgravamentMontlyRate.toString()
+                            : "0 %",
                         onTextChanged: updateDesgravamentRate,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -841,7 +1170,7 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     Text("Seguro vehícular Anual (%)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -849,7 +1178,9 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "0 %",
+                        hintText: existingVehicleLoanFound
+                            ? vehicleInsuranceAnnualRate.toString()
+                            : "0 %",
                         onTextChanged: updateVehicleInsuranceRate,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -864,7 +1195,32 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
+                    Text("COK Anual (%)",
+                        style: GoogleFonts.readexPro(
+                            color: tertiaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 12),
+                    InputFieldWidget(
+                        hintText: existingVehicleLoanFound
+                            ? annualCOK.toString()
+                            : "0 %",
+                        onTextChanged: updateAnnualCOK,
+                        isNumber: true),
+                    const SizedBox(height: 5),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      Text("Este valor tiene que ser mayor a 0",
+                          textAlign: TextAlign.right,
+                          style: GoogleFonts.poppins(
+                              color: (vehicleInsuranceAnnualRate == 0) &&
+                                      buttonClicked
+                                  ? Colors.red
+                                  : const Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                    ]),
+                    const SizedBox(height: 20),
                     Text("Envío físico de estado de cuenta (Mensual)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -872,10 +1228,11 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "${getCurrency()} 0",
+                        hintText:
+                            "${getCurrency()} ${existingVehicleLoanFound ? physicalShipment.toString() : "0"}",
                         onTextChanged: updatePhysicalShipment,
                         isNumber: true),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 35),
                     Text("Gastos de Administración (Mensual)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -883,7 +1240,8 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "${getCurrency()} 0",
+                        hintText:
+                            "${getCurrency()} ${existingVehicleLoanFound ? administrationExpenses.toString() : "0"}",
                         onTextChanged: updateAdministrationExpenses,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -898,7 +1256,7 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     Text("Costes Notariales",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -906,7 +1264,8 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "${getCurrency()} 0",
+                        hintText:
+                            "${getCurrency()} ${existingVehicleLoanFound ? notaryExpenses.toString() : "0"}",
                         onTextChanged: updateNotaryExpenses,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -920,7 +1279,7 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     Text("Costes Registrales",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -928,7 +1287,8 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
                     InputFieldWidget(
-                        hintText: "${getCurrency()} 0",
+                        hintText:
+                            "${getCurrency()} ${existingVehicleLoanFound ? registryExpenses.toString() : "0"}",
                         onTextChanged: updateRegistryExpenses,
                         isNumber: true),
                     const SizedBox(height: 5),
@@ -942,7 +1302,7 @@ class _HomeState extends State<Home> {
                               fontSize: 12,
                               fontWeight: FontWeight.w600)),
                     ]),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 25),
                     Text("Periodo de pago (Meses)",
                         style: GoogleFonts.readexPro(
                             color: tertiaryColor,
@@ -1078,7 +1438,9 @@ class _HomeState extends State<Home> {
                             children: [
                               const SizedBox(height: 10),
                               InputFieldWidget(
-                                hintText: "1 mes",
+                                hintText: existingVehicleLoanFound
+                                    ? gracePeriod.toString()
+                                    : "0 meses",
                                 onTextChanged: updateGracePeriod,
                               ),
                               const SizedBox(height: 5),
@@ -1180,14 +1542,20 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 20),
                     CustomButton(
-                      text: "Generar Plan de Pagos",
+                      text: existingVehicleLoanFound
+                          ? "Actualizar Plan de Pagos"
+                          : "Generar Plan de Pagos",
                       buttonColor: primaryColor,
                       textColor: textColor,
                       onPressed: () {
-                        setState(() {
-                          buttonClicked = true;
-                        });
-                        validateData();
+                        existingVehicleLoanFound
+                            ? {updatePaymentPlan()}
+                            : {
+                                setState(() {
+                                  buttonClicked = true;
+                                }),
+                                validateData()
+                              };
                       },
                     ),
                     const SizedBox(height: 50),

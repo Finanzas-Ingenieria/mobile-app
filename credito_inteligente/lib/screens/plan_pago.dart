@@ -63,6 +63,8 @@ class _PlanDePagoState extends State<PlanDePago> {
   late double VAN;
   late double TIR;
   late double TCEA;
+  late double annualCOK;
+  late double mountlyCOK;
   double finalQuoton = 0;
   int fixedDecimals = 16;
 
@@ -177,6 +179,9 @@ class _PlanDePagoState extends State<PlanDePago> {
 
     gracePeriod = planPago.vehicleLoan.gracePeriod;
     graceType = planPago.vehicleLoan.graceType;
+
+    annualCOK = planPago.vehicleLoan.annualCok;
+    mountlyCOK = convertToMonthlyRate(annualCOK);
 
     planPago = planPago;
     rows = planPago.planPagoRows;
@@ -563,7 +568,7 @@ class _PlanDePagoState extends State<PlanDePago> {
           flow: lastQuota,
         ));
 
-        double van = calculateVAN(rows, 3.43661 / 100);
+        double van = calculateVAN(rows, mountlyCOK);
         van = double.parse(van.toStringAsFixed(fixedDecimals));
 
         setState(() {
@@ -605,7 +610,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                     "Datos del Cliente",
                     style: GoogleFonts.readexPro(
                       color: tertiaryColor,
-                      fontSize: 20,
+                      fontSize: 19,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -613,11 +618,11 @@ class _PlanDePagoState extends State<PlanDePago> {
                     "${widget.vehicleLoan.client.name} ${widget.vehicleLoan.client.lastname}",
                     style: GoogleFonts.readexPro(
                       color: homeInputFileTextColor,
-                      fontSize: 20,
+                      fontSize: 19,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
                   Container(
                     margin: EdgeInsets.only(
                         left: MediaQuery.of(context).size.width * 0.15),
@@ -642,7 +647,8 @@ class _PlanDePagoState extends State<PlanDePago> {
                         buildTableRow("Periodo de Pago: ",
                             "${widget.vehicleLoan.paymentPeriod} meses"),
                         buildTableRow("Porcentaje de Depreciación: ",
-                            "${depreciationRate * 100} %")
+                            "${depreciationRate * 100} %"),
+                        buildTableRow("Código: ", widget.vehicleLoan.code)
                       ],
                     ),
                   ),
@@ -653,7 +659,7 @@ class _PlanDePagoState extends State<PlanDePago> {
                             "Última Cuota: ${widget.vehicleLoan.lastQuota}",
                             style: GoogleFonts.readexPro(
                               color: tertiaryColor,
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -662,13 +668,13 @@ class _PlanDePagoState extends State<PlanDePago> {
                             getLastQuotaMessage(widget.vehicleLoan.lastQuota),
                             style: GoogleFonts.readexPro(
                               color: homeInputFileTextColor,
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ])
                       : Container(),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 35),
                   Center(
                     child: CustomButton(
                       width: MediaQuery.of(context).size.width * 0.5,
@@ -715,8 +721,8 @@ class _PlanDePagoState extends State<PlanDePago> {
           child: Text(
             label,
             style: GoogleFonts.readexPro(
-              color: tertiaryColor,
-              fontSize: 20,
+              color: const Color.fromARGB(255, 62, 62, 62),
+              fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -727,7 +733,7 @@ class _PlanDePagoState extends State<PlanDePago> {
             value,
             style: GoogleFonts.readexPro(
               color: homeInputFileTextColor,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
           ),

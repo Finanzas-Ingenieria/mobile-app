@@ -6,12 +6,14 @@ class InputFieldWidget extends StatefulWidget {
   final String hintText;
   final bool obscureText;
   final bool isNumber;
+  final String initialValue;
   final Function(String) onTextChanged;
   const InputFieldWidget(
       {super.key,
       required this.hintText,
       this.obscureText = false,
       this.isNumber = false,
+      this.initialValue = '',
       required this.onTextChanged});
 
   @override
@@ -22,6 +24,19 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialValue != '') {
+      print("Initial value required");
+      _textEditingController.text = widget.initialValue;
+      print(
+          "HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+      print(_textEditingController.text);
+    }
+  }
 
   @override
   void dispose() {

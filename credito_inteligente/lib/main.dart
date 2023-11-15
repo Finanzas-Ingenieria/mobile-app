@@ -1,6 +1,7 @@
 import 'dart:ui';
 
-import 'package:credito_inteligente/screens/login.dart';
+import 'package:credito_inteligente/models/user.dart';
+import 'package:credito_inteligente/screens/main_menu.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -21,7 +22,14 @@ class _MyAppState extends State<MyApp> {
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         title: 'Crédito Inteligente',
-        home: const Login());
+        home: MainMenu(
+          user: User(
+              id: 1,
+              name: "name",
+              lastname: "lastname",
+              email: "email",
+              password: "password"),
+        ));
   }
 }
 
