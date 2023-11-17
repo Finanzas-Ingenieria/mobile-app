@@ -21,6 +21,11 @@ class Login extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                "assets/icons/car2.png",
+                width: screenWidth * 0.2,
+              ),
+              const SizedBox(height: 20),
               Text("Crédito vehicular inteligente",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
@@ -28,13 +33,13 @@ class Login extends StatelessWidget {
                     fontSize: 35,
                     fontWeight: FontWeight.w600,
                   )),
-              const SizedBox(height: 27),
+              const SizedBox(height: 20),
               Text(
                   "Disfruta los mejores años de tu auto con Compra Inteligente",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w400)),
-              const SizedBox(height: 58),
+              const SizedBox(height: 40),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,

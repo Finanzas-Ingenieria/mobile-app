@@ -308,17 +308,25 @@ class _HomeState extends State<Home> {
       gracePeriodIsValid = true;
     }
 
+    //print notary expenses
+    print("Notary Expenses: $notaryExpenses");
+
     if (clientName.isNotEmpty &&
-        clientLastName.isNotEmpty &&
-        vehicleValueIsValid(changingVehicleValue) &&
-        (rateAmount >= 8 && rateAmount <= 24) &&
-        desgravamentMontlyRate > 0 &&
-        vehicleInsuranceAnnualRate > 0 &&
-        administrationExpenses > 0 &&
-        notaryExpenses > 0 &&
-        mountlyIncome > 0 &&
-        registryExpenses > 0 &&
-        gracePeriodIsValid) {
+            clientLastName.isNotEmpty &&
+            vehicleValueIsValid(changingVehicleValue) &&
+            (rateAmount >= 8 && rateAmount <= 24) &&
+            desgravamentMontlyRate > 0 &&
+            vehicleInsuranceAnnualRate > 0 &&
+            administrationExpenses > 0 &&
+            notaryExpenses > 0 &&
+            selectedCurrency == "SOLES"
+        ? mountlyIncome > 1500
+        : mountlyIncome > 1500 / 3.8 &&
+            registryExpenses > 0 &&
+            gracePeriodIsValid) {
+      print("Why is this not working?");
+      print("Notary Expenses: $notaryExpenses");
+
       Client newClient = Client(
         id: 0,
         name: clientName,
@@ -612,7 +620,7 @@ class _HomeState extends State<Home> {
             Container(
                 margin: MediaQuery.of(context).size.width < webScreenWidth
                     ? const EdgeInsets.symmetric(horizontal: 40)
-                    : const EdgeInsets.symmetric(horizontal: 200),
+                    : const EdgeInsets.symmetric(horizontal: 180),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -797,10 +805,16 @@ class _HomeState extends State<Home> {
                         isNumber: true),
                     const SizedBox(height: 5),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                      Text("Este valor no puede ser $mountlyIncome",
+                      Text(
+                          selectedCurrency == 'DÓLARES'
+                              ? "El ingreso mensual debe ser mayor a \$${(1500 / 3.8).toStringAsFixed(2)}"
+                              : "El ingreso mensual debe ser mayor  a S/ 1500.00",
                           textAlign: TextAlign.right,
                           style: GoogleFonts.poppins(
-                              color: (mountlyIncome == 0) && buttonClicked
+                              color: (selectedCurrency == "SOLES"
+                                          ? mountlyIncome <= 1500
+                                          : mountlyIncome <= 1500 / 3.8) &&
+                                      buttonClicked
                                   ? Colors.red
                                   : const Color.fromARGB(255, 255, 255, 255),
                               fontSize: 12,

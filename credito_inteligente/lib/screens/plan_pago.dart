@@ -95,16 +95,24 @@ class _PlanDePagoState extends State<PlanDePago> {
     return pow(1 + rate, 1 / 12) - 1;
   }
 
+  String getCurrencySymbol(String currency) {
+    if (currency == "PEN") {
+      return "s/.";
+    } else {
+      return "\$";
+    }
+  }
+
   String getLastQuotaMessage(type) {
     finalQuotaAndAppraisalCost =
-        double.parse(finalQuotaAndAppraisalCost.toStringAsFixed(fixedDecimals));
+        double.parse(finalQuotaAndAppraisalCost.toStringAsFixed(3));
     if (type == "RENOVAR") {
       //limitate to 2 decimals
-      return "Tienes un saldo a Favor de $finalQuotaAndAppraisalCost";
+      return "Tienes un saldo a Favor de ${getCurrencySymbol(widget.vehicleLoan.currency)} $finalQuotaAndAppraisalCost";
     } else if (type == "QUEDAR") {
-      return "Valor del Cuotón Final $finalQuoton";
+      return "Valor del Cuotón Final ${getCurrencySymbol(widget.vehicleLoan.currency)}${finalQuoton.toStringAsFixed(3)}";
     } else {
-      return "Tienes un saldo a Favor de $finalQuotaAndAppraisalCost";
+      return "Tienes un saldo a Favor de ${getCurrencySymbol(widget.vehicleLoan.currency)} $finalQuotaAndAppraisalCost";
     }
   }
 
@@ -405,7 +413,7 @@ class _PlanDePagoState extends State<PlanDePago> {
       //resultado += 0.1; //TO ROUND UP
 
       // Limitar a 3 decimales
-      resultado = double.parse(resultado.toStringAsFixed(0));
+      //resultado = double.parse(resultado.toStringAsFixed(0));
       return resultado;
     }
   }
@@ -605,75 +613,44 @@ class _PlanDePagoState extends State<PlanDePago> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    "Datos del Cliente",
-                    style: GoogleFonts.readexPro(
-                      color: tertiaryColor,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    "${widget.vehicleLoan.client.name} ${widget.vehicleLoan.client.lastname}",
-                    style: GoogleFonts.readexPro(
-                      color: homeInputFileTextColor,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 30),
                   Container(
-                    margin: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.15),
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.2),
+                    margin: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.20),
                     child: Table(
                       columnWidths: const {
                         0: FlexColumnWidth(2.0),
                         1: FlexColumnWidth(2.0),
                       },
                       children: [
+                        buildTableRow("Datos del Cliente:",
+                            "${widget.vehicleLoan.client.name} ${widget.vehicleLoan.client.lastname}"),
                         buildTableRow("Precio del Vehículo:",
                             widget.vehicleLoan.vehiclePrice.toString()),
                         buildTableRow("Cuota Inicial:",
                             (widget.vehicleLoan.vehiclePrice * 0.2).toString()),
-                        buildTableRow("TEA:", "${rateAnualPercentage * 100}%"),
-                        buildTableRow("VAN:", VAN.toString()),
-                        buildTableRow("TIR:", "${TIR * 100}%"),
-                        buildTableRow("TCEA:", "${TCEA * 100}%"),
+                        buildTableRow("TEA:",
+                            "${(rateAnualPercentage * 100).toStringAsFixed(3)}%"),
+                        buildTableRow("VAN:", VAN.toStringAsFixed(3)),
+                        buildTableRow(
+                            "TIR:", "${(TIR * 100).toStringAsFixed(3)}%"),
+                        buildTableRow(
+                            "TCEA:", "${(TCEA * 100).toStringAsFixed(3)}%"),
+                        buildTableRow(
+                            "COK:", "${(annualCOK * 100).toStringAsFixed(3)}%"),
                         buildTableRow("Fecha de inicio: ",
                             widget.vehicleLoan.startedDate),
                         buildTableRow("Periodo de Pago: ",
                             "${widget.vehicleLoan.paymentPeriod} meses"),
                         buildTableRow("Porcentaje de Depreciación: ",
-                            "${depreciationRate * 100} %"),
-                        buildTableRow("Código: ", widget.vehicleLoan.code)
+                            "${(depreciationRate * 100).toStringAsFixed(3)} %"),
+                        buildTableRow("Código: ", widget.vehicleLoan.code),
+                        buildTableRow(
+                            "Última Cuota - ${widget.vehicleLoan.lastQuota}: ",
+                            getLastQuotaMessage(widget.vehicleLoan.lastQuota))
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  widget.fromHistory
-                      ? Column(children: [
-                          Text(
-                            "Última Cuota: ${widget.vehicleLoan.lastQuota}",
-                            style: GoogleFonts.readexPro(
-                              color: tertiaryColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            getLastQuotaMessage(widget.vehicleLoan.lastQuota),
-                            style: GoogleFonts.readexPro(
-                              color: homeInputFileTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ])
-                      : Container(),
                   const SizedBox(height: 35),
                   Center(
                     child: CustomButton(
@@ -716,26 +693,39 @@ class _PlanDePagoState extends State<PlanDePago> {
   TableRow buildTableRow(String label, String value) {
     return TableRow(
       children: [
-        Padding(
+        Container(
+          color: const Color.fromARGB(250, 113, 123, 132),
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            label,
-            style: GoogleFonts.readexPro(
-              color: const Color.fromARGB(255, 62, 62, 62),
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+          child: Container(
+            padding: const EdgeInsets.only(left: 20),
+            child: Text(
+              label,
+              style: GoogleFonts.readexPro(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
-        Padding(
+        Container(
+          color: const Color.fromARGB(248, 227, 229, 233),
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            value,
-            style: GoogleFonts.readexPro(
-              color: homeInputFileTextColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(right: 20),
+                child: Text(
+                  value,
+                  style: GoogleFonts.readexPro(
+                    color: tertiaryColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

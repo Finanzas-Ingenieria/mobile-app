@@ -95,7 +95,9 @@ class _SelectCarState extends State<SelectCar> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 40),
+            margin: MediaQuery.of(context).size.width < webScreenWidth
+                ? const EdgeInsets.symmetric(horizontal: 40)
+                : const EdgeInsets.symmetric(horizontal: 180),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -133,59 +135,67 @@ class _SelectCarState extends State<SelectCar> {
                     itemCount: cars.length,
                     itemBuilder: (context, index) {
                       final car = cars[index];
-                      return ListTile(
-                        leading: Image.network(
-                          car.imagePath,
-                          width: 100,
-                          fit: BoxFit.contain,
-                        ),
-                        title: Text(car.name),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: car.color,
-                                    shape: BoxShape.circle,
+                      return InkWell(
+                        onTap: () => Navigator.of(context).pop(car),
+                        child: ListTile(
+                          leading: Image.network(
+                            car.imagePath,
+                            width: 100,
+                            fit: BoxFit.contain,
+                          ),
+                          title: Text(car.name),
+                          subtitle: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: car.color,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
+                                  const SizedBox(width: 8),
+                                  Text(car.colorName),
+                                ],
+                              ),
+                              Center(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      widget.currency == "SOLES"
+                                          ? "S/ ${car.price}"
+                                          : "\$ ${car.usdPrice.round()}",
+                                      style: GoogleFonts.readexPro(
+                                        color: tertiaryColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(car);
+                                      },
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.black),
+                                      ),
+                                      child: const Text('Seleccionar',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 8),
-                                Text(car.colorName),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  widget.currency == "SOLES"
-                                      ? "S/ ${car.price}"
-                                      : "\$ ${car.usdPrice.round()}",
-                                  style: GoogleFonts.readexPro(
-                                    color: tertiaryColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const Spacer(),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(car);
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Colors.black),
-                                  ),
-                                  child: const Text('Seleccionar',
-                                      style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

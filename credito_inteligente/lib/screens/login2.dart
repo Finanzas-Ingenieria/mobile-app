@@ -232,10 +232,12 @@ class _Login2State extends State<Login2> {
                               borderRadius: BorderRadius.all(Radius.circular(
                                   10)) // Makes the container circular
                               ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
-                              FeatherIcons
-                                  .facebook, // Replace with your desired icon
+                              i == 1
+                                  ? FeatherIcons.instagram
+                                  : FeatherIcons
+                                      .facebook, // Replace with your desired icon
                               size: 24,
                               color: Colors.black, // Color of the icon
                             ),

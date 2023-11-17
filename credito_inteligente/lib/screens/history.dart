@@ -76,7 +76,9 @@ class _HistoryState extends State<History> {
         ),
         body: SingleChildScrollView(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 40),
+            margin: MediaQuery.of(context).size.width < webScreenWidth
+                ? const EdgeInsets.symmetric(horizontal: 40)
+                : const EdgeInsets.symmetric(horizontal: 160),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

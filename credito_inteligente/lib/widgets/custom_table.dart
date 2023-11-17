@@ -20,7 +20,7 @@ class _CustomTableState extends State<CustomTable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 251, 255),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(5),
@@ -56,8 +56,8 @@ class _CustomTableState extends State<CustomTable> {
                         width: 250,
                         text: "Regresar",
                         fontSize: 18,
-                        buttonColor: const Color.fromARGB(255, 97, 114, 208),
-                        textColor: textColor,
+                        buttonColor: const Color.fromARGB(255, 255, 255, 255),
+                        textColor: Colors.indigo,
                         onPressed: () {
                           Navigator.pop(context);
                         }),
@@ -70,6 +70,7 @@ class _CustomTableState extends State<CustomTable> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
 
                     controller: scrollController, // Add the scrollController
@@ -123,7 +124,7 @@ class _CustomTableState extends State<CustomTable> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(column,
-                      style: GoogleFonts.roboto(
+                      style: GoogleFonts.openSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       )),
@@ -173,16 +174,16 @@ class _CustomTableState extends State<CustomTable> {
             ? const Color.fromARGB(
                 172, 206, 221, 254) // Your color for "P" or "T"
             : (entry.key >= 3 && entry.key <= 7)
-                ? const Color.fromARGB(172, 206, 221, 254)
+                ? const Color.fromARGB(255, 241, 244, 251)
                 : (entry.key == 0)
                     ? const Color.fromARGB(172, 255, 203, 155)
-                    : const Color.fromARGB(133, 255, 245, 236);
+                    : const Color.fromARGB(248, 255, 250, 250);
       } else if (entry.key == 0) {
         backgroundColor = const Color.fromARGB(172, 255, 203, 155);
       } else {
         backgroundColor = (entry.key >= 3 && entry.key <= 7)
-            ? const Color.fromARGB(172, 206, 221, 254)
-            : const Color.fromARGB(133, 255, 245, 236);
+            ? const Color.fromARGB(255, 241, 244, 251)
+            : const Color.fromARGB(248, 255, 250, 250);
       }
 
       return TableCell(
@@ -192,9 +193,9 @@ class _CustomTableState extends State<CustomTable> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
                 '${entry.key > 2 ? entry.value.toStringAsFixed(2) : entry.value}',
-                style: GoogleFonts.roboto(
+                style: GoogleFonts.openSans(
                   fontSize: 14,
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w500,
                 )),
           ),
         ),

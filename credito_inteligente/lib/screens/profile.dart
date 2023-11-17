@@ -22,7 +22,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         title: Text(
-          'Your Profile',
+          'Tu Perfil',
           style: GoogleFonts.readexPro(
             fontSize: 22,
             fontWeight: FontWeight.w400,
@@ -51,19 +51,22 @@ class _ProfileState extends State<Profile> {
           ),
           margin: const EdgeInsets.symmetric(horizontal: 200),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 100),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 80),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Rounded Image
-                const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: NetworkImage(
-                      "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"),
+                ClipOval(
+                  child: Image.network(
+                    "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg",
+                    scale: 1.0,
+                    fit: BoxFit.cover, // Make the image cover the circle avatar
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
-                const SizedBox(height: 20),
+
                 // Name and Last Name
                 Text('Name: ${widget.user.name}',
                     style: GoogleFonts.readexPro(
@@ -77,7 +80,7 @@ class _ProfileState extends State<Profile> {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 20),
                 // Email
                 Text(
                   'Email: ${widget.user.email}',
@@ -89,9 +92,9 @@ class _ProfileState extends State<Profile> {
                 const SizedBox(height: 8),
                 // Password with show/hide icon
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.3,
                   padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.1),
+                      horizontal: MediaQuery.of(context).size.width * 0.05),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
