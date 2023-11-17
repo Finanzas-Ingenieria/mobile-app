@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 import '../models/vehicle_loan.dart';
 
 class VehicleLoanService {
-  final String baseUrl = 'http://localhost:8090/api/vehicleLoans';
+  final String baseUrl =
+      'https://credito-inteligente-api.azurewebsites.net/api/vehicleLoans';
   bool _isRequestCanceled = false;
   final Completer<void> _completer = Completer<void>();
 

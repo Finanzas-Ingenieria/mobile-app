@@ -4,7 +4,8 @@ import '../models/user.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  final String baseUrl = 'http://localhost:8090/api/users';
+  final String baseUrl =
+      'https://credito-inteligente-api.azurewebsites.net/api/users';
 
   Future<List<User>> getAllUsers() async {
     final url = Uri.parse(baseUrl);
